@@ -4,6 +4,7 @@
 //
 // Global Variables
 let shapestate = 0; //0-circle 1-square 2-Trinagle 3-Transistion
+let startTime, elapsedTime;
 
 
 function setup() {
@@ -17,12 +18,14 @@ function draw() {
   drawshape();
   //print("frame: " + frameCount)
   manageTimer();
-  
+
 
 }
 
 function manageTimer(){
-  print(millis());
+  //print(millis());
+  elapsedTime = millis()
+  text(elapsedTime/1000, width*0.3, height*0.75);
 
 }
 function keyPressed(){
@@ -31,6 +34,9 @@ function keyPressed(){
   //            2 -> 3   (for 2 seconds) -> 0
   if (shapestate < 3){
     shapestate++;
+    if(shapestate===3){
+      startTime
+    }
 
   }
 
