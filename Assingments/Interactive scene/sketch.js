@@ -1,13 +1,13 @@
 // Interactive Scene
 // Syed Saad Hussain
 // September 16, 2025
-//
+
 // This code will have moving elements such as the protagonist
 
-let g = 755; // ground level
-let tg = 538; // bottom (y) coordinate of the mountain tops
+let g = 425; // ground level
+let topl = 300; // height of the mountain 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+  createCanvas(540,540);
   
   
 }
@@ -22,12 +22,21 @@ function draw() {
   textSize(16);
 
   // Display pwinMouseX.
-text(pwinMouseX, 75, 75 );
+fill("red")
+text(pwinMouseX, 150, 150 );
  // display pwinMouseY.
- text(pwinMouseY, 50, 50)
- mountains()
- mtops()
+ fill("blue")
+ //text(pwinMouseY, 50, 50)
 
+ mountains()
+
+
+}
+function mountains(){
+  fill("grey")
+  triangle(-1,g,60,topl,120,g)
+  triangle(50,g,120,topl-5,200,g)
+  triangle(170,g,200,topl-8,280,g)
 }
    
  
@@ -35,16 +44,3 @@ text(pwinMouseX, 75, 75 );
   
   
 
-function mountains(){
-  fill("grey")
-  triangle(110,g,280,500,550,g)
-  triangle(540,g,700,500,900,g)
-  triangle(870,g,1200,450,1500,g)
-  
-}
-function mtops(){
-  fill("white")
-  triangle(254,tg,280,500,321,tg)
-  triangle(676,tg,700,500,730,tg)
-
-}
