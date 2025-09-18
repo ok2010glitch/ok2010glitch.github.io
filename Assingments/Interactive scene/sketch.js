@@ -18,7 +18,7 @@ function draw() {
   fill("green")
 
   noStroke()
-  rect(windowWidth-1913, windowHeight-200, windowWidth, 500)
+  rect(windowWidth+1050, windowHeight-200, windowWidth, 500)
   textSize(16);
 
   // Display pwinMouseX.
