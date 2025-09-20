@@ -4,11 +4,13 @@
 
 // This code will have moving elements such as the protagonist
 // GLobal Variables
-let g = 425; // ground level
+let gl = 425; // ground level
 let topl = 275; // height of the mountain 
 let xb = 212 // for the boat
 let boatspeed = 2 // You can control the speed of the boat here
 let showobject = true;
+let bc = "white" // boat's sail color
+let suncolor = "yellow"
 function setup() {
   createCanvas(540,540);
   
@@ -16,12 +18,22 @@ function setup() {
 }
 
 function draw() {
-  background("skyblue")
+  
+   // 0, 181, 226 -> skyblue but brighter
+   // 1, 51, 63 -> darker
+
+  // took some help from chatgpt, the mapping part
+  let r = map(mouseY, 0, height, 0, 1);
+  let g = map(mouseY, 0, height, 181, 51);
+  let b = map(mouseY, 0, height, 226, 63);   
+  
+  background(r,g,b);
+                                  
   
   fill("green")
 
   noStroke()
-  rect(0, g, 540, 115)
+  rect(0, gl, 540, 115)
   textSize(16);
 
 // Displays the x coordinate
@@ -31,7 +43,7 @@ text(pwinMouseX, 150, 150 );
 fill("blue")
 text(pwinMouseY, 50, 50);
 
-
+sun();
 mountains();
 lake();
 boat();
@@ -39,10 +51,13 @@ cloud();
 
 
 
-// Sun
-fill(255, 196, 0)
-circle(390,75,75);
 
+if (mouseY < gl){
+  suncolor = "yellow";
+} else{
+  suncolor = color(246, 241, 213);
+
+}
 
 // Moving the boat right left
 if (keyIsDown(RIGHT_ARROW) && (xb + 30) < 540){ // (xb + 30) < 540) --> for restricting the boat from going outside the canvas
@@ -51,38 +66,41 @@ if (keyIsDown(RIGHT_ARROW) && (xb + 30) < 540){ // (xb + 30) < 540) --> for rest
 if (keyIsDown(LEFT_ARROW) && xb > 30){
   xb -= boatspeed;
 }
-
-if(showobject){
-  cloud();
-  somethingpressed()
+if (keyCode === 67){ // pressing letter c will change the colour
+  bc = "orange"
 }
-if (keyIsDown(65)){
-  
+if (keyCode === 82){ // press r and it will reset the color
+  bc = "white"
 }
 
+
+
 }
+
+
+
+
 
 
 function mountains(){
   fill("grey")
-  triangle(-5,g,60,topl,200,g)
-  triangle(50,g,160,topl-5,280,g)
-  triangle(170,g,240,topl-8,360,g)
+  triangle(-5,gl,60,topl,200,gl)
+  triangle(50,gl,160,topl-5,280,gl)
+  triangle(170,gl,240,topl-8,360,gl)
 }
 function lake(){
   fill(85, 171, 199)
-  rect(0,g,540,50)
+  rect(0,gl,540,50)
 }
 
 function boat(){
-  // This is Saad's boat
   fill(112, 96, 74)
   arc(xb, 410, 60, 40, 0, PI, PIE);
   
   // Mass stick holding the eboat
   rect(xb-2,380, 4,30)
   
-  fill("white")
+  fill(bc)
   // sail of the boat
   triangle(xb-26,400,xb,370,xb+26,400)
 }
@@ -95,6 +113,9 @@ function cloud(){
   circle(286,126,45);
 
 }
-  
+function sun(){
+fill(suncolor)
+circle(390,75,75);
+}  
   
 
