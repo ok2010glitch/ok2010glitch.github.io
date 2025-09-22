@@ -6,11 +6,13 @@
 // GLobal Variables
 let gl = 425; // ground level
 let topl = 275; // height of the mountain 
-let xb = 212 // for the boat
-let boatspeed = 2 // You can control the speed of the boat here
-let showobject = true;
-let bc = "white" // boat's sail color
-let suncolor = "yellow"
+let xb = 212; // for the boat
+let boatspeed = 2; // You can control the speed of the boat here
+let bc = "white"; // boat's sail color
+let suncolor = "yellow";
+//let colorl = color(85, 171, 199)
+// position of the sun (x coordinate)
+// let currentback = 0;
 function setup() {
   createCanvas(540,540);
   
@@ -43,12 +45,14 @@ text(pwinMouseX, 150, 150 );
 fill("blue")
 text(pwinMouseY, 50, 50);
 
+
+//drawshape();
+
 sun();
 mountains();
 lake();
 boat();
 cloud();
-
 
 
 
@@ -64,13 +68,13 @@ if (keyIsDown(RIGHT_ARROW) && (xb + 30) < 540){ // (xb + 30) < 540) --> for rest
   xb += boatspeed;
 }
 if (keyIsDown(LEFT_ARROW) && xb > 30){
-  xb -= boatspeed;
+  xb -= boatspeed;  
 }
 if (keyCode === 67){ // pressing letter c will change the colour
-  bc = "orange"
+  bc = "orange";
 }
 if (keyCode === 82){ // press r and it will reset the color
-  bc = "white"
+  bc = "white";
 }
 
 
@@ -78,7 +82,35 @@ if (keyCode === 82){ // press r and it will reset the color
 }
 
 
+// function mousePressed(){
+//   if(mouseButton === CENTER){
+//     currentback++;
+//     if(currentback > 3){  // reset when > 3
+//       currentback = 0;  
+//     }
+//   }
+// }
 
+
+
+// function drawshape(){
+//   // inspect our state variable, and draw 1 and 4 possible 
+//   //option, depending on the current variable
+//   switch(currentback){
+//     case 0:
+//       lakecolor = color(40, 208, 138)
+//       break;
+//     case 1:
+//       lakecolor = color(230, 179, 157)
+//       break;
+//     case 2:
+//       lakecolor = color(114, 166, 158)
+//       break;
+//     case 3:
+//       lakecolor = color(154, 185, 184)
+//       break;
+// }
+// }
 
 
 
@@ -105,7 +137,6 @@ function boat(){
   triangle(xb-26,400,xb,370,xb+26,400)
 }
  
-
 function cloud(){
   fill("white")
   circle(275,138,45);
@@ -113,9 +144,9 @@ function cloud(){
   circle(286,126,45);
 
 }
+
 function sun(){
 fill(suncolor)
 circle(390,75,75);
 }  
   
-
