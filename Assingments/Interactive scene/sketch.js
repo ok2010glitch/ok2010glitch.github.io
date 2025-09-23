@@ -7,13 +7,14 @@
 let gl = 425; // ground level
 let topl = 275; // height of the mountain 
 let xb = 212; // for the boat
-let boatspeed = 2; // You can control the speed of the boat here
+let boatspeed = 3.5; // You can control the speed of the boat here
 let bc = "white"; // boat's sail color
 let suncolor = "yellow";
 let bgcolor;
 let xs = 390;
 // position of the sun (x coordinate)
 let currentback = 0;
+let iscrescent = false;
 //let cx = 275; // Cloud x coordinate 
 function setup() {
   createCanvas(540,540);
@@ -26,33 +27,30 @@ function setup() {
 function draw() {
 
 
-  
-// 0, 181, 226 -> skyblue but brighter
-// 1, 51, 63 -> darker
-
-// took some help from chatgpt, (the mapping part)
-// let r = map(mouseY, 0, height, 0, 1);
-// let g = map(mouseY, 0, height, 181, 51);
-// let b = map(mouseY, 0, height, 226, 63);   
 colourChanging();
-
 background(bgcolor);
                                   
   
 fill("green")
-
 noStroke()
 rect(0, gl, 540, 115)
   
 
-
-
-
+// All natural elements
 sun();
 mountains();
 lake();
 boat();
+// crescent
+if(iscrescent === true){ // checks whether it's true or false according ot the background
+  fill(17, 18, 1);
+  circle(xs + 5, 75, 75)
+} else{
+  iscrescent = false;
+}
+
 cloud();
+
 
 // text for illustrator's name
 textSize(20)
@@ -81,15 +79,6 @@ if (keyCode === 67){ // pressing letter c will change the colour
 if (keyCode === 82){ // press r and it will reset the color
   bc = "white";
 }
-// Cloud movement
-// if (cx < 540 || cx > 0){
-//   cx += 0.7
-//   //  Makes the cloud go on an repetitive loop
-//   if(cx > 570){
-//     cx = -60
-//     cx += 0.7
-
-//   }
 
 }
 
@@ -101,6 +90,7 @@ if (keyCode === 82){ // press r and it will reset the color
 function mousePressed(){
   if(mouseButton === CENTER){
     currentback++;
+    // infinite loop 
     if(currentback > 3){  // reset when > 3
       currentback = 0;  
     }
@@ -116,26 +106,22 @@ function colourChanging(){
     case 0:
       bgcolor = color(47, 175, 181); // bright teal
       suncolor = "yellow";
-      fill("yellow");
-      circle(xs, 75,75);
+      iscrescent = false;
       break;
     case 1:
        bgcolor = color(111, 196, 200); // light blue
        suncolor = "yellow";
-       fill("yellow");
-      circle(xs, 75,75);
+       iscrescent = false;
       break;
     case 2:
-      bgcolor = color(53, 116, 119); // dark blue
+      bgcolor = color(26, 33, 54); // dark blue
       suncolor = color(200, 200, 255);
-      fill(53, 116, 119);
-      circle(xs + 10, 75, 75);
+      iscrescent = false;
       break;
     case 3:
-      bgcolor = color(29, 66, 67); // Night time
+      bgcolor = color(17, 18, 17); // Night time
       suncolor = color(200, 200, 255);
-      fill(29, 66, 67);
-      circle(xs + 10, 75, 75);
+      iscrescent = true;
       break;
     default:
       bgcolor = color(0, 181, 226);
