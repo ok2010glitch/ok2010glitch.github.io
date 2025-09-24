@@ -12,11 +12,13 @@ let noiseTime = 5, noiseSpeed = 0.1;
 let minSize = 5; 
 let maxSize = 200;
 
+let mX, mY; //move x and y
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
   x1 = width*0.3; y1 = height*0.3;
   x2 = width*0.7; y2 = height*0.5;
+  mY = height*0.3;
   frameRate(1000);
 
 }
@@ -27,6 +29,10 @@ function draw() {
   noiseCircle();
 }
 
+function noiseMove(){
+  //use random noise to set the postion of a third circle
+  x2 = noise(noiseTIme)
+}
 
 function noiseCircle(){
   // draw a fixed circle with randoml
