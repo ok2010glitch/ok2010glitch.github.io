@@ -28,7 +28,8 @@ function draw() {
   // updating the direction
   if(pmouseX < mouseX){
     facing = true;
-  }else if(pmouseX > mouseX){
+  }
+  else if(pmouseX > mouseX){
     facingRight = false;
   }
 
