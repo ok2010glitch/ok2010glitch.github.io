@@ -2,10 +2,10 @@
 // Syed Saad Hussain
 // September 16, 2025
 
-// This code will have moving elements such as the protagonist
+// This code will have moving elements such as the boat
 // GLobal Variables
 let gl = 425; // ground level
-let topl = 275; // height of the mountain 
+let topl = 250; // coordinate of the highest mountain level (for all mountains)
 let xb = 212; // for the boat
 let boatspeed = 2.5; // You can control the speed of the boat here
 let suncolor = "yellow";
@@ -21,15 +21,11 @@ function setup() {
   createCanvas(540,540);
   bgcolor = color(0, 181, 226);
 
-  
-  
 }
 
 function draw() {
 
-
 colourChanging();
-
 background(bgcolor);
                                   
   
@@ -43,7 +39,9 @@ sun();
 mountains();
 lake();
 boat();
-// crescent
+
+
+// Crescent
 if(iscrescent === true){ // checks whether it's true or false according ot the background
   fill(17, 18, 1);
   circle(xs + 5, 75, 75);
@@ -51,14 +49,15 @@ if(iscrescent === true){ // checks whether it's true or false according ot the b
   iscrescent = false;
 }
 
+// Waxing crescent
 if(currentback === 2){
   // checks if the current back value is 2
-  // waxing crescent
   fill(26, 33, 54);
   circle(xs + 20, 75, 75);
 }
 
 cloud();
+
 
 
 // text for illustrator's name
@@ -72,10 +71,7 @@ text("Syed Saad Hussain", 350, 520)
 // text("X: " + mouseX + "  Y: " + mouseY, mouseX + 20, mouseY);
 
 
-
-//ALL MOVEMENTS HERE
-
-// Moving the boat right left
+// BOATS MOVEMENT
 if (keyIsDown(RIGHT_ARROW) && (xb + 30) < 540){ // (xb + 30) < 540) --> for restricting the boat from going outside the canvas
   xb += boatspeed;
 }
@@ -86,13 +82,10 @@ if (keyIsDown(LEFT_ARROW) && xb > 30){
 }
 
 
-
-
-
-
 function mousePressed(){
-  if(mouseButton === CENTER){
-    currentback++;
+  if(mouseButton === CENTER){ // pressing ht ecenter button of the mouse will change
+                              // change the background
+    currentback++; 
     // infinite loop 
     if(currentback > 3){  // reset when > 3
       currentback = 0;  
@@ -143,7 +136,7 @@ function mountains(){
 
 
 function lake(){
-  fill("blue");
+  fill(8, 220, 252);
   rect(0,gl,540,50);
 }
 
