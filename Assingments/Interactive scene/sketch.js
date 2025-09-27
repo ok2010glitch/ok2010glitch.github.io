@@ -11,12 +11,9 @@ let boatspeed = 2.5; // You can control the speed of the boat here
 let suncolor = "yellow";
 let bgcolor;
 let xs = 390; // x coordinate of the sun
-
-
-// position of the sun (x coordinate)
 let currentback = 0;
 let iscrescent = false;
-//let cx = 275; // Cloud x coordinate 
+
 function setup() {
   createCanvas(540,540);
   bgcolor = color(0, 181, 226);
@@ -43,14 +40,14 @@ boat();
 
 // Crescent
 if(iscrescent === true){ // checks whether it's true or false according ot the background
-  fill(17, 18, 1);
+  fill(17, 18, 17);
   circle(xs + 5, 75, 75);
 } else{
   iscrescent = false;
 }
 
 // Waxing crescent
-if(currentback === 2){
+if(currentback === 2){ // for the third case
   // checks if the current back value is 2
   fill(26, 33, 54);
   circle(xs + 20, 75, 75);
@@ -83,7 +80,7 @@ if (keyIsDown(LEFT_ARROW) && xb > 30){
 
 
 function mousePressed(){
-  if(mouseButton === CENTER){ // pressing ht ecenter button of the mouse will change
+  if(mouseButton === CENTER){ // pressing the center button of the mouse will
                               // change the background
     currentback++; 
     // infinite loop 
@@ -118,9 +115,7 @@ function colourChanging(){
       suncolor = color(200, 200, 255);
       iscrescent = true;
       break;
-    default:
-      bgcolor = color(0, 181, 226);
-      break;
+    
 }
 }
 
@@ -145,7 +140,7 @@ function boat(){
   fill(112, 96, 74);
   arc(xb, 410, 60, 40, 0, PI, PIE);
   
-  // Mass stick holding the eboat
+  // Mass stick holding the boat
   rect(xb-2,380, 4,30);
   
   // sail of the boat
