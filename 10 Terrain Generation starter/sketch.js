@@ -6,49 +6,42 @@
 // Extra for Experts:
 // - describe what you did to take this project "above and beyond"
 
-
 let rectWidth = 1;
-let time = 0
-let pantime = 1
-
-
+let time;
+let noiseStart = 5;
+let noiseSpeed = 0.002;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  //for now, generate the terrain once
-  generateTerrain();
-  
+  rectMode(CORNERS);
+  time = noiseStart; // Initialize time
 }
 
-function generateTerrain(){
-  // Use a loop to generate and draw several
-  // rectangles side to side to look like 2D 
-  // terrain.
-  rectMode(CORNERS);
+function draw() {
+  background(220); // Clear canvas each frame
+  time = noiseStart; // Reset time for consistent terrain
+  generateTerrain();
+  noiseStart += 0.1; // Pan the terrain
+}
 
-  for(let x = 0; x < width; x+=rectWidth){
-    // generate a random height.
-    // NOTE!! change this from random() to noise()
+function generateTerrain() {
+  for (let x = 0; x < width; x += rectWidth) {
     let noiseVal = noise(time);
-    let rectHeight = map(noiseVal, 0, 1, height*0.2, height*0.9);
+    let rectHeight = map(noiseVal, 0, 1, 0, height * 0.9); // Optional rounding
 
-    // calculate the upper-right corner of rect
     let x2 = x + rectWidth;
     let y2 = height - rectHeight;
 
     rect(x, height, x2, y2);
+    time += noiseSpeed;
 
-    time += 0.01
-
+  if(keyCode === RIGHT_ARROW){
+    rectWidth += 5
+    if(rectWidth = 51 ){
+      rectWidth = 51;
+    }
   }
 
-  rectMode(CORNER);  //revert to default
-}
-
-function draw() {
-  // don't need to use draw UNTIL
-  // animating the terrain (panning)
-  
-  //background(220);
-  //generateTerrain();
+    
+  }
 }

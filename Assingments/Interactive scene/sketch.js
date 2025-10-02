@@ -10,7 +10,7 @@ let xb = 212; // for the boat
 let boatspeed = 2.5; // You can control the speed of the boat here
 let suncolor = "yellow";
 let bgcolor;
-let xs = 390; // x coordinate of the sun
+let xs = 390;   // x coordinate of the sun
 let currentback = 0;
 let iscrescent = false;
 
