@@ -59,13 +59,11 @@ function generateTerrain(){
   // terrain.
   
 
-  for(let x = 0; x < width; x+=rectWidth){
-    // generate a random height.
-    // NOTE!! change this from random() to noise()
+function generateTerrain() {
+  for (let x = 0; x < width; x += rectWidth) {
     let noiseVal = noise(time);
     let rectHeight = map(noiseVal, 0, 1, 0.2, height*0.9);
 
-    // calculate the upper-right corner of rect
     let x2 = x + rectWidth;
     let y2 = height - rectHeight;
 
@@ -81,11 +79,17 @@ function generateTerrain(){
 
 
     rect(x, height, x2, y2);
+    time += noiseSpeed;
 
     time += noiseSpeed;
     
   
 
+  if(keyCode === RIGHT_ARROW){
+    rectWidth += 5
+    if(rectWidth = 51 ){
+      rectWidth = 51;
+    }
   }
   
 
@@ -93,6 +97,7 @@ function generateTerrain(){
 
 
   
+}
 }
 
 function drawflag(x, y){
@@ -114,6 +119,8 @@ function KeyPressed(){
     
     }
   }
+
+}
 
 function calcAvg(){
 
