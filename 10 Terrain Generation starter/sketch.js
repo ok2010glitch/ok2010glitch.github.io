@@ -3,65 +3,18 @@
 // Saad Hussain
 // September 29, 2025
 
-
-let rectWidth = 0.5;
-let noiseStart = 1;
-let noiseSpeed = 0.002;
-let time;
-let avgh;
-
-
-
-
 // Global Variables
 let rectWidth = 1;
 let time;
 let noiseStart = 3;
 let noiseSpeed = 0.001;
 
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
   //for now, generate the terrain once
   generateTerrain();
   rectMode(CORNERS);
-  
-}
-function draw() {
-  time = noiseStart;
-  
-  // don't need to use draw UNTIL
-  // animating the terrain (panning)
-  noiseStart += 0.01;
-  background(220);
-  generateTerrain();
-  
-  if(keyIsDown (RIGHT_ARROW) ){
-    rectWidth += 0.01
-    if(rectWidth === 20){
-      rectWidth = 20;
-    }
-    
-    }
-  else if(keyIsDown (LEFT_ARROW) ){
-    rectWidth -= 0.01
-    if(rectWidth === 0.05)
-       rectWidth = 0.05;
-    
-    }
-}
-
-function generateTerrain(){
-
-  let HighestY = height;
-  let HighestX = 0;
-  
-  
-
-  // Use a loop to generate and draw several
-  // rectangles side to side to look like 2D 
-  // terrain.
-  
-
   
 }
 
@@ -95,27 +48,22 @@ function generateTerrain() {
   let HighestX = -1;
   let totalHeight = 0 // all rectangles total height
   let rectn = 0
+  let rectHeight;
   
   
   
   for (let x = 0; x < width; x += rectWidth) {
     let noiseVal = noise(time);
-    let rectHeight = map(noiseVal, 0, 1, 0.2, height*0.9);
-    let rectHeight = map(noiseVal, 0, 1, 0, height * 0.9);
+    rectHeight = map(noiseVal, 0, 1, 0.2, height*0.9);
+    rectHeight = map(noiseVal, 0, 1, 0, height * 0.9);
 
     let x2 = x + rectWidth;
     let y2 = height - rectHeight;
 
-    if(y2 < HighestY){
-      HighestY = y2;
-      HighestX = x2;
-    }
+
 
     
     
-
-    fill("black");
-
 
     fill("black");
 
@@ -123,7 +71,7 @@ function generateTerrain() {
     time += noiseSpeed;
     
 
-    time += noiseSpeed;
+   
     
   
     // for average
@@ -139,38 +87,12 @@ function generateTerrain() {
     
   }
 }
-  
-
-  drawflag(HighestX, HighestY);
 
 
   
-
-
-function drawflag(x, y){
-
-  //flag pole
-
-  strokeWeight(3);
-  fill("black");
-  line(x, y, x, y-50)
-  // circle on flagpole
-  fill("red")
-  circle(x, y-50, 25)
-
-}
-
-function KeyPressed(){
-  if(keyCode === RIGHT_ARROW ){
-    rectWidth += 0.05
-    
-    }
-  }
-
-
-
   let avgHeight = totalHeight /rectn; // dividing the total height of all rects by the total number
   let avgY = height - avgHeight;
+  strokeWeight(10);
   stroke("red");
   line(0, avgY, width, avgY);
 
