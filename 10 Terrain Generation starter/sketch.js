@@ -1,13 +1,12 @@
-// Starter Code for our
-// Terrain GEneration
+// Perlin Noise Assignment
 // Saad Hussain
 // September 29, 2025
 
 // Global Variables
 let rectWidth = 1;
 let time;
-let noiseStart = 3;
-let noiseSpeed = 0.001;
+let noiseStart = 1; 
+
 
 
 function setup() {
@@ -19,35 +18,35 @@ function setup() {
 }
 
 function draw() {
-  background(220); // Clear canvas each frame
+  background(220);
   time = noiseStart; // Reset time for consistent terrain
   generateTerrain();
   noiseStart += 0.01 // Pan the terrain
 
-// CHanging the width of the terrain
+// Changing the width of the terrain
   if(keyIsDown(RIGHT_ARROW)){
     rectWidth = rectWidth + 0.01;
-    // if(rectWidth === 20){
-    //   rectWidth = 20
+     if(rectWidth === 20){
+       rectWidth = 20;
 
     }
+  }
   
   else if(keyIsDown(LEFT_ARROW)){
     rectWidth = rectWidth - 0.01;
-    // if(rectWidth === 0.05){
-    //   rectWidth = 0.05
+     if(rectWidth === 0.05){
+       rectWidth = 0.05;
 
     }
-  
-  
-
   }
+}
+  
 
 function generateTerrain() {
   let HighestY = height;
-  let HighestX = -1;
+  let HighestX = 0;
   let totalHeight = 0 // all rectangles total height
-  let rectn = 0
+  let rectn = 0 // number of rectangle in the canvas
   let rectHeight;
   
   
@@ -62,18 +61,13 @@ function generateTerrain() {
 
 
 
-    
-    
-
     fill("black");
 
     rect(x, height, x2, y2);
-    time += noiseSpeed;
+    
+    time += 0.001
     
 
-   
-    
-  
     // for average
     totalHeight += rectHeight;
     rectn ++;
@@ -89,15 +83,14 @@ function generateTerrain() {
 }
 
 
-  
   let avgHeight = totalHeight /rectn; // dividing the total height of all rects by the total number
   let avgY = height - avgHeight;
-  strokeWeight(10);
+  strokeWeight(5);
   stroke("red");
   line(0, avgY, width, avgY);
 
+  // color for flag
   stroke("black");
-  
   drawflag(HighestX, HighestY);
   
 }
@@ -105,13 +98,13 @@ function generateTerrain() {
 
 function drawflag(x, y){
   // flag pole
-  strokeWeight(2);
+  strokeWeight(10);
   fill("black");
-  line(x, y, x, y-25);
+  line(x, y, x, y-50);
 
   // flag
   fill("red");
-  triangle(x,y-25,x, y-50, x + 20, y-35);
+  triangle(x,y-50,x, y-75, x + 20, y-63.5);
   
   
 
