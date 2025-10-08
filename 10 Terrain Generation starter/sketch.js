@@ -7,8 +7,6 @@ let rectWidth = 1;
 let time;
 let noiseStart = 1; 
 
-
-
 function setup() {
   createCanvas(windowWidth, windowHeight);
   //for now, generate the terrain once
@@ -65,19 +63,16 @@ function generateTerrain() {
 
     rect(x, height, x2, y2);
     
-    time += 0.001
+    time += 0.001// incrementing the noise creating smoother terrain
     
 
     // for average
     totalHeight += rectHeight;
     rectn ++;
     
-
-
-  
-  if(y2 < HighestY){
+  if(y2 < HighestY){ // find the highest point of the rectangle
     HighestY = y2;
-    HighestX = x2 // middle of the rectangle
+    HighestX = x2; 
     
   }
 }
@@ -105,8 +100,4 @@ function drawflag(x, y){
   // flag
   fill("red");
   triangle(x,y-50,x, y-75, x + 20, y-63.5);
-  
-  
-
-
 }
