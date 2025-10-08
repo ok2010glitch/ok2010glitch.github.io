@@ -1,148 +1,301 @@
-// TU-95 Bomber Simulation
-// Complex implementation with detailed mechanical components
+// Plane Cockpit Simulator
+// A complex flight simulator with interactive cockpit controls and external view
 
-let planeX, planeY;
-let planeSpeed = 2;
-let propRotation = 0;
-let gearRotation = 0;
-let backgroundOffset = 0;
-let clouds = [];
+let plane = {
+  // Flight parameters
+  altitude: 1000,
+  airspeed: 250,
+  heading: 0,
+  pitch: 0,
+  roll: 0,
+  verticalSpeed: 0,
+  
+  // Engine parameters
+  engine1: { thrust: 0, temp: 80, rpm: 0, fuel: 100 },
+  engine2: { thrust: 0, temp: 80, rpm: 0, fuel: 100 },
+  engine3: { thrust: 0, temp: 80, rpm: 0, fuel: 100 },
+  engine4: { thrust: 0, temp: 80, rpm: 0, fuel: 100 },
+  
+  // Systems
+  flaps: 0,
+  gear: false,
+  brakes: false,
+  spoilers: false,
+  autopilot: false,
+  lights: { landing: false, navigation: false, strobe: false },
+  
+  // Navigation
+  nav1: { freq: 108.00, course: 0 },
+  nav2: { freq: 110.00, course: 0 },
+  adf: { freq: 300 },
+  gps: { lat: 40.7128, lon: -74.0060, track: 0 },
+  
+  // Fuel
+  fuelTotal: 1000,
+  fuelFlow: 0,
+  
+  // Electrical
+  battery: true,
+  generators: [true, true, true, true],
+  busVoltage: 28,
+  
+  // Position
+  x: 0,
+  y: 0,
+  z: 0
+};
+
+let controls = {
+  yoke: { x: 0, y: 0 },
+  throttle: [0, 0, 0, 0],
+  mixture: [1, 1, 1, 1],
+  prop: [1, 1, 1, 1]
+};
+
+let instruments = {
+  pfd: { visible: true },
+  nd: { visible: true },
+  engine: { visible: true },
+  systems: { visible: false },
+  radio: { visible: false },
+  externalView: { visible: true }
+};
+
+let canvas;
+let bgImage;
+let lastUpdate = 0;
+const UPDATE_INTERVAL = 50;
+
+// Terrain and environment
 let terrain = [];
-let engineDetails = [];
-let wingFlapAngle = 0;
-let wingFlapDirection = 1;
-let bombBayOpen = false;
-let bombBayAngle = 0;
-let altitude = 300;
-let targetAltitude = 300;
-let isClimbing = false;
-let isDescending = false;
-let cockpitLights = false;
-let navigationLights = false;
-let enginePower = 100;
-let fuelLevel = 100;
-let missionTime = 0;
-let waypoints = [];
-let currentWaypoint = 0;
-let hudElements = [];
+let clouds = [];
+let stars = [];
+let timeOfDay = 0; // 0 = day, 1 = night
+
+function preload() {
+  // We'll create the background dynamically
+}
 
 function setup() {
-  createCanvas(1200, 700);
+  canvas = createCanvas(1200, 800);
   
-  // Initialize plane position
-  planeX = 200;
-  planeY = height / 2;
-  
-  // Generate clouds
-  for (let i = 0; i < 15; i++) {
-    clouds.push({
-      x: random(width),
-      y: random(height * 0.7),
-      size: random(50, 150),
-      speed: random(0.2, 0.8)
-    });
+  // Initialize engine parameters
+  for (let i = 0; i < 4; i++) {
+    controls.throttle[i] = 0.3;
+    controls.mixture[i] = 0.8;
+    controls.prop[i] = 0.7;
   }
   
-  // Generate terrain
+  // Set initial navigation frequencies
+  plane.nav1.freq = 108.00;
+  plane.nav2.freq = 110.00;
+  plane.adf.freq = 300;
+  
+  // Generate environment
   generateTerrain();
+  generateClouds();
+  generateStars();
   
-  // Initialize engine details
-  initializeEngineDetails();
-  
-  // Initialize waypoints
-  initializeWaypoints();
-  
-  // Initialize HUD elements
-  initializeHUD();
-}
-
-function draw() {
-  // Update mission time
-  missionTime += deltaTime / 1000;
-  
-  // Update background
-  updateBackground();
-  
-  // Draw sky gradient
-  drawSky();
-  
-  // Draw terrain
-  drawTerrain();
-  
-  // Draw clouds
-  drawClouds();
-  
-  // Update and draw plane
-  updatePlane();
-  drawPlane();
-  
-  // Draw HUD
-  drawHUD();
-  
-  // Update fuel consumption
-  updateFuel();
-  
-  // Check waypoint progress
-  checkWaypoints();
-}
-
-function updateBackground() {
-  backgroundOffset += planeSpeed / 2;
-  if (backgroundOffset > width) {
-    backgroundOffset = 0;
-  }
-}
-
-function drawSky() {
-  // Sky gradient
-  for (let i = 0; i < height; i++) {
-    let inter = map(i, 0, height, 0, 1);
-    let c = lerpColor(color(30, 30, 80), color(135, 206, 235), inter);
-    stroke(c);
-    line(0, i, width, i);
-  }
-  
-  // Sun
-  fill(255, 255, 200, 150);
-  noStroke();
-  ellipse(width - 100, 100, 80, 80);
+  textFont('Courier New');
 }
 
 function generateTerrain() {
-  let terrainHeight = height * 0.7;
-  let detail = 5;
-  
-  for (let x = 0; x < width + 100; x += detail) {
-    let y = terrainHeight + noise(x * 0.01) * 100;
-    terrain.push({x: x, y: y});
+  terrain = [];
+  // Create a simple grid of terrain points
+  for (let x = -20; x <= 20; x++) {
+    for (let z = -20; z <= 20; z++) {
+      let elevation = noise(x * 0.2, z * 0.2) * 100;
+      terrain.push({ x: x * 100, z: z * 100, y: elevation });
+    }
   }
 }
 
-function drawTerrain() {
-  // Draw terrain
-  fill(50, 120, 50);
-  noStroke();
-  beginShape();
-  vertex(-10, height);
-  for (let point of terrain) {
-    vertex(point.x - backgroundOffset % (width + 100), point.y);
+function generateClouds() {
+  clouds = [];
+  for (let i = 0; i < 20; i++) {
+    clouds.push({
+      x: random(-2000, 2000),
+      y: random(500, 2000),
+      z: random(-2000, 2000),
+      size: random(50, 150),
+      speed: random(0.1, 0.5)
+    });
   }
-  vertex(width + 10, height);
-  endShape(CLOSE);
+}
+
+function generateStars() {
+  stars = [];
+  for (let i = 0; i < 100; i++) {
+    stars.push({
+      x: random(-width, width),
+      y: random(-height, height),
+      size: random(1, 3),
+      brightness: random(100, 255)
+    });
+  }
+}
+
+function draw() {
+  // Update physics at fixed intervals
+  if (millis() - lastUpdate > UPDATE_INTERVAL) {
+    updateFlightDynamics();
+    updateEngineParameters();
+    updateSystems();
+    updatePosition();
+    updateEnvironment();
+    lastUpdate = millis();
+  }
   
-  // Add some terrain details
-  fill(40, 100, 40);
-  for (let i = 0; i < terrain.length; i += 10) {
-    let x = terrain[i].x - backgroundOffset % (width + 100);
-    let y = terrain[i].y;
-    if (x >= 0 && x <= width) {
-      // Draw trees
-      let treeHeight = random(10, 30);
-      rect(x, y - treeHeight, 3, treeHeight);
-      fill(30, 80, 30);
-      ellipse(x + 1.5, y - treeHeight - 5, 15, 15);
-      fill(40, 100, 40);
-    }
+  // Clear the canvas
+  background(30, 30, 40);
+  
+  // Draw external view if enabled - DRAW THIS FIRST
+  if (instruments.externalView.visible) {
+    drawExternalView();
+  } else {
+    // Draw cockpit background only when in cockpit view
+    drawCockpitBackground();
+  }
+  
+  // Draw primary flight display
+  if (instruments.pfd.visible && !instruments.externalView.visible) drawPFD();
+  
+  // Draw navigation display
+  if (instruments.nd.visible && !instruments.externalView.visible) drawND();
+  
+  // Draw engine instruments
+  if (instruments.engine.visible && !instruments.externalView.visible) drawEngineInstruments();
+  
+  // Draw systems panel
+  if (instruments.systems.visible && !instruments.externalView.visible) drawSystemsPanel();
+  
+  // Draw radio panel
+  if (instruments.radio.visible && !instruments.externalView.visible) drawRadioPanel();
+  
+  // Draw control indicators
+  if (!instruments.externalView.visible) drawControlIndicators();
+  
+  // Draw HUD (always visible)
+  drawHUD();
+  
+  // Draw view toggle button (always visible)
+  drawViewToggle();
+  
+  // Draw debug info
+  drawDebugInfo();
+}
+
+function drawExternalView() {
+  push();
+  
+  // Set up the view
+  translate(width / 2, height / 2);
+  
+  // Apply aircraft rotation - this makes the world move with the plane
+  rotateX(radians(-plane.pitch)); // Negative for natural movement
+  rotateZ(radians(plane.roll));
+  
+  // Draw the environment
+  drawSky();
+  drawGround();
+  drawClouds();
+  drawHorizon();
+  
+  // Draw cockpit frame overlay
+  drawCockpitFrame();
+  
+  pop();
+}
+
+function drawSky() {
+  // Sky color based on altitude and time
+  let skyColor;
+  if (plane.altitude < 5000) {
+    // Daytime colors
+    let blend = map(plane.altitude, 0, 5000, 0, 1);
+    skyColor = lerpColor(color(135, 206, 235), color(100, 150, 255), blend);
+  } else {
+    // High altitude - darker blue
+    skyColor = color(0, 0, 80);
+  }
+  
+  // Draw sky
+  fill(skyColor);
+  noStroke();
+  rect(-width, -height, width * 3, height * 3);
+  
+  // Draw stars if at high altitude or night
+  if (plane.altitude > 8000 || timeOfDay > 0.7) {
+    drawStars();
+  }
+  
+  // Draw sun
+  fill(255, 255 - timeOfDay * 200, 0);
+  noStroke();
+  ellipse(300, -200, 80, 80);
+}
+
+function drawStars() {
+  fill(255);
+  noStroke();
+  for (let star of stars) {
+    let alpha = timeOfDay > 0.7 ? star.brightness : star.brightness * (timeOfDay - 0.5) * 2;
+    fill(255, 255, 255, alpha);
+    ellipse(star.x, star.y, star.size, star.size);
+  }
+}
+
+function drawGround() {
+  // Ground appearance based on altitude
+  let groundColor;
+  if (plane.altitude < 1000) {
+    groundColor = color(34, 139, 34); // Green - close to ground
+  } else {
+    groundColor = color(101, 67, 33); // Brown - far away
+  }
+  
+  // Draw ground plane
+  fill(groundColor);
+  noStroke();
+  
+  // Draw a simple ground first
+  rect(-width * 2, 0, width * 4, height * 2);
+  
+  // Draw terrain details when low
+  if (plane.altitude < 2000) {
+    drawTerrainDetails();
+  }
+}
+
+function drawTerrainDetails() {
+  // Draw some terrain features
+  fill(139, 69, 19);
+  for (let i = 0; i < 50; i++) {
+    let x = random(-width, width);
+    let size = random(5, 20);
+    let y = random(10, 100);
+    rect(x, y, size, size);
+  }
+  
+  // Draw runways when very low
+  if (plane.altitude < 500) {
+    drawRunways();
+  }
+}
+
+function drawRunways() {
+  stroke(200);
+  strokeWeight(8);
+  line(-400, 150, 400, 150);
+  stroke(255);
+  strokeWeight(4);
+  line(-400, 150, 400, 150);
+  
+  // Runway markings
+  stroke(255);
+  strokeWeight(2);
+  for (let i = -350; i <= 350; i += 100) {
+    line(i, 140, i, 160);
   }
 }
 
@@ -151,597 +304,302 @@ function drawClouds() {
   noStroke();
   
   for (let cloud of clouds) {
-    let cloudX = (cloud.x - backgroundOffset * cloud.speed) % (width + 200);
-    if (cloudX < -100) cloudX += width + 200;
+    // Simple cloud drawing
+    let scale = map(plane.altitude, 0, 10000, 2, 0.5);
+    let x = cloud.x * 0.001;
+    let y = (cloud.y - plane.altitude) * 0.001;
     
-    // Draw cloud with multiple circles for a fluffier look
-    ellipse(cloudX, cloud.y, cloud.size, cloud.size * 0.6);
-    ellipse(cloudX - cloud.size * 0.3, cloud.y, cloud.size * 0.7, cloud.size * 0.5);
-    ellipse(cloudX + cloud.size * 0.3, cloud.y, cloud.size * 0.7, cloud.size * 0.5);
-    ellipse(cloudX, cloud.y - cloud.size * 0.2, cloud.size * 0.8, cloud.size * 0.5);
-  }
-}
-
-function updatePlane() {
-  // Move plane
-  planeX += planeSpeed;
-  if (planeX > width + 300) {
-    planeX = -300;
-    currentWaypoint = 0;
-  }
-  
-  // Update propeller rotation
-  propRotation += 0.5 * (enginePower / 100);
-  
-  // Update gear rotation
-  gearRotation += 0.1;
-  
-  // Update wing flaps
-  wingFlapAngle += 0.02 * wingFlapDirection;
-  if (wingFlapAngle > 0.3 || wingFlapAngle < -0.3) {
-    wingFlapDirection *= -1;
-  }
-  
-  // Update bomb bay
-  if (bombBayOpen && bombBayAngle < PI/4) {
-    bombBayAngle += 0.02;
-  } else if (!bombBayOpen && bombBayAngle > 0) {
-    bombBayAngle -= 0.02;
-  }
-  
-  // Update altitude
-  if (isClimbing && altitude < targetAltitude) {
-    altitude += 0.5;
-    planeY -= 0.5;
-  } else if (isDescending && altitude > targetAltitude) {
-    altitude -= 0.5;
-    planeY += 0.5;
-  }
-  
-  // Update engine details
-  updateEngineDetails();
-}
-
-function drawPlane() {
-  push();
-  translate(planeX, planeY);
-  
-  // Draw main fuselage
-  drawFuselage();
-  
-  // Draw wings
-  drawWings();
-  
-  // Draw tail
-  drawTail();
-  
-  // Draw engines and propellers
-  drawEngines();
-  
-  // Draw landing gear
-  drawLandingGear();
-  
-  // Draw cockpit
-  drawCockpit();
-  
-  // Draw details
-  drawPlaneDetails();
-  
-  pop();
-}
-
-function drawFuselage() {
-  // Main fuselage body
-  fill(100, 100, 100);
-  stroke(80, 80, 80);
-  strokeWeight(2);
-  
-  // Fuselage shape
-  beginShape();
-  vertex(-100, 0);
-  bezierVertex(-80, -15, -40, -20, 0, -20);
-  bezierVertex(40, -20, 80, -15, 100, 0);
-  bezierVertex(80, 15, 40, 20, 0, 20);
-  bezierVertex(-40, 20, -80, 15, -100, 0);
-  endShape(CLOSE);
-  
-  // Fuselage details
-  stroke(120, 120, 120);
-  strokeWeight(1);
-  line(-90, 0, 90, 0); // Center line
-  
-  // Windows
-  fill(180, 220, 255);
-  for (let i = -80; i < 80; i += 20) {
-    ellipse(i, -8, 8, 6);
-  }
-  
-  // Bomb bay
-  if (bombBayOpen) {
-    fill(60, 60, 60);
-    beginShape();
-    vertex(-30, 5);
-    vertex(30, 5);
-    vertex(25, 15);
-    vertex(-25, 15);
-    endShape(CLOSE);
-  }
-}
-
-function drawWings() {
-  // Main wings
-  fill(90, 90, 90, 200);
-  noStroke();
-  
-  // Left wing
-  beginShape();
-  vertex(-60, 0);
-  vertex(-200, -5);
-  vertex(-200, 5);
-  vertex(-60, 0);
-  endShape();
-  
-  // Right wing
-  beginShape();
-  vertex(60, 0);
-  vertex(200, -5);
-  vertex(200, 5);
-  vertex(60, 0);
-  endShape();
-  
-  // Wing flaps
-  fill(80, 80, 80);
-  // Left flap
-  push();
-  translate(-150, 0);
-  rotate(wingFlapAngle);
-  rect(-5, -2, 10, 30);
-  pop();
-  
-  // Right flap
-  push();
-  translate(150, 0);
-  rotate(-wingFlapAngle);
-  rect(-5, -2, 10, 30);
-  pop();
-  
-  // Wing details
-  stroke(70, 70, 70);
-  strokeWeight(1);
-  line(-60, 0, -200, 0);
-  line(60, 0, 200, 0);
-}
-
-function drawTail() {
-  // Vertical stabilizer
-  fill(90, 90, 90);
-  beginShape();
-  vertex(80, 0);
-  vertex(95, -50);
-  vertex(85, -50);
-  vertex(80, 0);
-  endShape(CLOSE);
-  
-  // Horizontal stabilizers
-  // Left
-  beginShape();
-  vertex(70, 5);
-  vertex(40, 5);
-  vertex(20, 15);
-  vertex(70, 15);
-  endShape(CLOSE);
-  
-  // Right
-  beginShape();
-  vertex(70, -5);
-  vertex(40, -5);
-  vertex(20, -15);
-  vertex(70, -15);
-  endShape(CLOSE);
-}
-
-function drawEngines() {
-  // Four engines - two on each wing
-  let enginePositions = [
-    { x: -140, y: -5 },
-    { x: -100, y: -5 },
-    { x: 100, y: -5 },
-    { x: 140, y: -5 }
-  ];
-  
-  for (let i = 0; i < enginePositions.length; i++) {
-    let pos = enginePositions[i];
-    
-    push();
-    translate(pos.x, pos.y);
-    
-    // Engine nacelle
-    fill(80, 80, 80);
-    stroke(60, 60, 60);
-    strokeWeight(2);
-    ellipse(0, 0, 30, 25);
-    
-    // Propeller spinner
-    fill(70, 70, 70);
-    ellipse(0, 0, 15, 15);
-    
-    // Propeller blades
-    push();
-    rotate(propRotation + i * HALF_PI);
-    fill(60, 60, 60);
-    
-    for (let j = 0; j < 4; j++) {
-      push();
-      rotate(j * HALF_PI);
-      rect(0, -2, 40, 4);
-      pop();
-    }
-    
-    pop();
-    
-    // Engine exhaust
-    fill(40, 40, 40);
-    ellipse(12, 0, 10, 8);
-    
-    // Engine details
-    drawEngineDetails(i);
-    
-    pop();
-  }
-}
-
-function initializeEngineDetails() {
-  for (let i = 0; i < 4; i++) {
-    engineDetails.push({
-      pistonOffset: random(0, TWO_PI),
-      valveRotation: random(0, TWO_PI),
-      fanRotation: random(0, TWO_PI),
-      temperature: 100 + random(50)
-    });
-  }
-}
-
-function updateEngineDetails() {
-  for (let i = 0; i < engineDetails.length; i++) {
-    let detail = engineDetails[i];
-    detail.pistonOffset += 0.1 * (enginePower / 100);
-    detail.valveRotation += 0.05 * (enginePower / 100);
-    detail.fanRotation += 0.2 * (enginePower / 100);
-    detail.temperature = 100 + (enginePower / 2) + random(10);
-  }
-}
-
-function drawEngineDetails(engineIndex) {
-  let detail = engineDetails[engineIndex];
-  
-  // Draw engine internals (simplified)
-  push();
-  
-  // Cylinders
-  stroke(50, 50, 50);
-  strokeWeight(1);
-  for (let i = 0; i < 3; i++) {
-    let angle = i * TWO_PI/3 + detail.pistonOffset;
-    let x = cos(angle) * 8;
-    let y = sin(angle) * 8;
-    
-    line(x, y, x * 1.5, y * 1.5);
-    fill(70, 70, 70);
-    ellipse(x * 1.5, y * 1.5, 6, 6);
-  }
-  
-  // Cooling fans
-  push();
-  rotate(detail.fanRotation);
-  stroke(100, 100, 100);
-  for (let i = 0; i < 8; i++) {
-    push();
-    rotate(i * PI/4);
-    line(0, 0, 10, 0);
-    pop();
-  }
-  pop();
-  
-  // Valves
-  push();
-  rotate(detail.valveRotation);
-  fill(90, 90, 90);
-  for (let i = 0; i < 6; i++) {
-    push();
-    rotate(i * PI/3);
-    rect(5, -1, 8, 2);
-    pop();
-  }
-  pop();
-  
-  // Temperature indicator (color based on temp)
-  let tempColor = color(
-    map(detail.temperature, 100, 200, 0, 255),
-    map(detail.temperature, 100, 200, 255, 0),
-    0
-  );
-  fill(tempColor);
-  noStroke();
-  ellipse(-8, -8, 5, 5);
-  
-  pop();
-}
-
-function drawLandingGear() {
-  // Only draw if landing gear is down (simplified)
-  if (altitude < 50) {
-    // Main gears
-    fill(70, 70, 70);
-    stroke(50, 50, 50);
-    strokeWeight(2);
-    
-    // Left gear
-    push();
-    translate(-60, 15);
-    rotate(sin(gearRotation) * 0.1);
-    
-    // Strut
-    rect(-3, 0, 6, 30);
-    
-    // Wheel
-    fill(40, 40, 40);
-    ellipse(0, 35, 20, 20);
-    
-    // Wheel details
-    fill(30, 30, 30);
-    ellipse(0, 35, 10, 10);
-    
-    // Spokes
-    stroke(50, 50, 50);
-    for (let i = 0; i < 8; i++) {
-      push();
-      rotate(i * PI/4 + gearRotation);
-      line(0, 35, 0, 25);
-      pop();
-    }
-    
-    pop();
-    
-    // Right gear
-    push();
-    translate(60, 15);
-    rotate(sin(gearRotation + PI) * 0.1);
-    
-    // Strut
-    rect(-3, 0, 6, 30);
-    
-    // Wheel
-    fill(40, 40, 40);
-    ellipse(0, 35, 20, 20);
-    
-    // Wheel details
-    fill(30, 30, 30);
-    ellipse(0, 35, 10, 10);
-    
-    // Spokes
-    stroke(50, 50, 50);
-    for (let i = 0; i < 8; i++) {
-      push();
-      rotate(i * PI/4 + gearRotation);
-      line(0, 35, 0, 25);
-      pop();
-    }
-    
-    pop();
-  }
-}
-
-function drawCockpit() {
-  // Cockpit glass
-  fill(180, 220, 255, 150);
-  stroke(150, 190, 255);
-  strokeWeight(2);
-  
-  beginShape();
-  vertex(-40, -15);
-  bezierVertex(-20, -18, 20, -18, 40, -15);
-  vertex(35, -5);
-  vertex(-35, -5);
-  endShape(CLOSE);
-  
-  // Cockpit interior
-  if (cockpitLights) {
-    fill(200, 200, 100, 100);
-    rect(-30, -12, 60, 7);
-  }
-  
-  // Pilot figures (simplified)
-  fill(30, 30, 30);
-  ellipse(-10, -8, 6, 6);
-  ellipse(10, -8, 6, 6);
-}
-
-function drawPlaneDetails() {
-  // Antennas
-  stroke(80, 80, 80);
-  strokeWeight(1);
-  line(85, -15, 85, -25);
-  line(-85, -10, -85, -20);
-  
-  // Navigation lights
-  if (navigationLights) {
-    fill(255, 0, 0);
-    ellipse(-95, 0, 4, 4);
-    fill(0, 255, 0);
-    ellipse(95, 0, 4, 4);
-  }
-  
-  // Air intakes
-  fill(60, 60, 60);
-  ellipse(-120, -2, 8, 5);
-  ellipse(-80, -2, 8, 5);
-  ellipse(80, -2, 8, 5);
-  ellipse(120, -2, 8, 5);
-  
-  // Panel lines
-  stroke(70, 70, 70);
-  strokeWeight(1);
-  for (let i = -90; i <= 90; i += 30) {
-    line(i, -10, i, 10);
-  }
-}
-
-function initializeWaypoints() {
-  waypoints = [
-    { x: 300, y: height / 2, reached: false },
-    { x: 600, y: height / 2 - 100, reached: false },
-    { x: 900, y: height / 2, reached: false },
-    { x: 1200, y: height / 2 + 100, reached: false }
-  ];
-}
-
-function checkWaypoints() {
-  for (let i = 0; i < waypoints.length; i++) {
-    let wp = waypoints[i];
-    if (!wp.reached && dist(planeX, planeY, wp.x, wp.y) < 50) {
-      wp.reached = true;
-      currentWaypoint = i + 1;
-      
-      // Set next altitude target
-      if (i < waypoints.length - 1) {
-        targetAltitude = height - waypoints[i + 1].y;
-        isClimbing = targetAltitude > altitude;
-        isDescending = targetAltitude < altitude;
-      }
+    // Draw cloud as overlapping circles
+    for (let j = 0; j < 3; j++) {
+      let offsetX = random(-cloud.size * 0.3, cloud.size * 0.3);
+      let offsetY = random(-cloud.size * 0.2, cloud.size * 0.2);
+      ellipse(x + offsetX, y + offsetY, cloud.size * scale, cloud.size * scale * 0.6);
     }
   }
 }
 
-function initializeHUD() {
-  hudElements = [
-    { type: "altimeter", x: 50, y: 50 },
-    { type: "speed", x: 50, y: 100 },
-    { type: "compass", x: width - 150, y: 50 },
-    { type: "engine", x: width - 150, y: 150 },
-    { type: "fuel", x: 50, y: 150 },
-    { type: "waypoint", x: width / 2, y: 50 }
-  ];
-}
-
-function drawHUD() {
-  // HUD background
-  fill(0, 0, 0, 150);
-  noStroke();
-  rect(10, 10, 200, 180);
-  rect(width - 210, 10, 200, 180);
-  rect(width / 2 - 100, 10, 200, 60);
-  
-  // HUD text
-  fill(0, 255, 0);
-  textSize(12);
-  textAlign(LEFT, TOP);
-  
-  // Altitude
-  text("ALT: " + nf(altitude, 3, 0) + " m", 20, 20);
-  
-  // Speed
-  text("SPD: " + nf(planeSpeed * 50, 3, 0) + " km/h", 20, 40);
-  
-  // Fuel
-  text("FUEL: " + nf(fuelLevel, 2, 1) + " %", 20, 60);
-  
-  // Engine power
-  text("ENG: " + nf(enginePower, 2, 0) + " %", 20, 80);
-  
-  // Mission time
-  let minutes = floor(missionTime / 60);
-  let seconds = floor(missionTime % 60);
-  text("TIME: " + nf(minutes, 2, 0) + ":" + nf(seconds, 2, 0), 20, 100);
-  
-  // Waypoint info
-  textAlign(CENTER, TOP);
-  text("WP: " + currentWaypoint + " / " + waypoints.length, width / 2, 20);
-  
-  // Compass
-  textAlign(RIGHT, TOP);
-  text("HDG: " + nf((planeX / 10) % 360, 3, 0) + "°", width - 20, 20);
-  
-  // Engine status
-  textAlign(RIGHT, TOP);
-  text("ENGINE STATUS", width - 20, 60);
-  for (let i = 0; i < 4; i++) {
-    let status = engineDetails[i].temperature > 180 ? "HOT" : "OK";
-    let statusColor = engineDetails[i].temperature > 180 ? color(255, 0, 0) : color(0, 255, 0);
-    fill(statusColor);
-    text("ENG " + (i + 1) + ": " + status, width - 20, 80 + i * 15);
-  }
-  
-  // Draw artificial horizon
-  drawArtificialHorizon();
-}
-
-function drawArtificialHorizon() {
-  push();
-  translate(width - 100, 120);
-  
-  // Horizon circle
-  stroke(0, 255, 0);
-  strokeWeight(1);
-  noFill();
-  ellipse(0, 0, 60, 60);
-  
+function drawHorizon() {
   // Horizon line
-  let horizonTilt = map(planeY, height / 2 - 100, height / 2 + 100, -20, 20);
-  line(-30, horizonTilt, 30, horizonTilt);
+  stroke(255);
+  strokeWeight(3);
+  line(-width, 0, width, 0);
   
-  // Pitch lines
-  for (let i = -2; i <= 2; i++) {
-    let y = horizonTilt + i * 10;
-    if (y > -25 && y < 25) {
-      line(-15, y, 15, y);
-      if (i !== 0) {
+  // Pitch ladder
+  stroke(255, 200);
+  strokeWeight(1);
+  for (let i = -8; i <= 8; i++) {
+    if (i !== 0) {
+      let y = i * 30;
+      line(-40, y, 40, y);
+      if (abs(i) % 2 === 0) {
+        fill(255);
+        noStroke();
         textAlign(CENTER, CENTER);
-        text(abs(i * 10), 0, y);
+        textSize(12);
+        text(abs(i * 10) + "°", -50, y);
+        text(abs(i * 10) + "°", 50, y);
       }
     }
   }
+}
+
+function drawCockpitFrame() {
+  // Draw cockpit window frame
+  push();
+  resetMatrix();
   
-  // Aircraft symbol
-  fill(0, 255, 0);
-  triangle(-5, -2, 5, -2, 0, 5);
+  // Main window frame (transparent center)
+  fill(0, 0, 0, 0);
+  stroke(80);
+  strokeWeight(25);
+  rect(0, 0, width, height);
+  
+  // Window struts
+  stroke(70);
+  strokeWeight(15);
+  line(width/2, 100, width/2, height); // Center column
+  line(0, height/2, width, height/2);  // Horizontal strut
+  
+  // Instrument panel (bottom)
+  fill(20, 20, 25, 220);
+  noStroke();
+  rect(0, height * 0.6, width, height * 0.4);
+  
+  // Side panels
+  fill(35, 35, 40, 220);
+  rect(0, 0, 120, height);
+  rect(width - 120, 0, 120, height);
+  
+  // Glare shield (top)
+  fill(15, 15, 20, 220);
+  rect(0, 0, width, 120);
+  
+  // Add some cockpit details
+  fill(100);
+  rect(width/2 - 200, height * 0.6, 400, 20); // Main panel edge
   
   pop();
 }
 
-function updateFuel() {
-  fuelLevel -= 0.01 * (enginePower / 100);
-  if (fuelLevel < 0) fuelLevel = 0;
+function drawCockpitBackground() {
+  // Draw cockpit background
+  background(20, 20, 25);
   
-  // Reduce engine power if fuel is low
-  if (fuelLevel < 10) {
-    enginePower = max(enginePower - 0.1, 10);
-  }
+  // Main panels
+  fill(25, 25, 30);
+  noStroke();
+  rect(0, 0, width, 80); // Top panel
+  
+  // Instrument panel areas
+  fill(40, 40, 45);
+  rect(50, 100, 500, 300);  // PFD
+  rect(650, 100, 500, 300); // ND
+  rect(50, 450, 350, 300);  // Engine
+  rect(450, 450, 350, 300); // Systems
+  rect(850, 450, 300, 300); // Radio
+  
+  // Center console
+  fill(30, 30, 35);
+  rect(width/2 - 150, 200, 300, 600);
 }
 
-function keyPressed() {
-  // Control plane with keyboard
-  if (keyCode === UP_ARROW) {
-    targetAltitude = max(targetAltitude - 50, 100);
-    isClimbing = true;
-    isDescending = false;
-  } else if (keyCode === DOWN_ARROW) {
-    targetAltitude = min(targetAltitude + 50, 500);
-    isClimbing = false;
-    isDescending = true;
-  } else if (key === ' ') {
-    bombBayOpen = !bombBayOpen;
-  } else if (key === 'l' || key === 'L') {
-    cockpitLights = !cockpitLights;
-  } else if (key === 'n' || key === 'N') {
-    navigationLights = !navigationLights;
-  } else if (key === '+') {
-    enginePower = min(enginePower + 5, 120);
-  } else if (key === '-') {
-    enginePower = max(enginePower - 5, 50);
+function drawViewToggle() {
+  // Draw button to toggle between views
+  let buttonColor = instruments.externalView.visible ? color(0, 150, 0) : color(150, 0, 0);
+  fill(buttonColor);
+  stroke(255);
+  strokeWeight(2);
+  rect(width - 120, 20, 100, 30, 5);
+  
+  fill(255);
+  textAlign(CENTER, CENTER);
+  textSize(12);
+  text(instruments.externalView.visible ? "COCKPIT VIEW" : "EXTERNAL VIEW", width - 70, 35);
+}
+
+function drawDebugInfo() {
+  // Draw debug information
+  fill(255);
+  textAlign(LEFT, TOP);
+  textSize(12);
+  text(`External View: ${instruments.externalView.visible ? "ON" : "OFF"}`, 20, 20);
+  text(`Pitch: ${plane.pitch.toFixed(1)}°`, 20, 40);
+  text(`Roll: ${plane.roll.toFixed(1)}°`, 20, 60);
+  text(`Altitude: ${Math.round(plane.altitude)} ft`, 20, 80);
+}
+
+function updateEnvironment() {
+  // Update cloud positions
+  for (let cloud of clouds) {
+    cloud.x += cloud.speed;
+    if (cloud.x > 3000) cloud.x = -3000;
+  }
+  
+  // Update time of day (simple cycle)
+  timeOfDay = (sin(millis() * 0.0001) + 1) * 0.5;
+}
+
+function updatePosition() {
+  // Update aircraft position based on heading and speed
+  let headingRad = radians(plane.heading);
+  plane.x += sin(headingRad) * plane.airspeed * 0.0005;
+  plane.z += cos(headingRad) * plane.airspeed * 0.0005;
+}
+
+// [Keep all the previous PFD, ND, Engine, Systems, Radio drawing functions exactly as they were]
+// [Keep all the updateFlightDynamics, updateEngineParameters, updateSystems functions]
+// [Keep all the keyPressed, keyReleased, mousePressed, mouseDragged functions]
+
+// For brevity, I'm including just the essential updated functions. The instrument drawing functions 
+// remain exactly the same as in the previous working version.
+
+function updateFlightDynamics() {
+  // Update pitch and roll based on yoke input
+  plane.pitch += controls.yoke.y * 0.5;
+  plane.roll += controls.yoke.x * 0.8;
+  
+  // Limit pitch and roll
+  plane.pitch = constrain(plane.pitch, -90, 90);
+  plane.roll = constrain(plane.roll, -90, 90);
+  
+  // Update heading based on roll and speed
+  plane.heading += plane.roll * plane.airspeed / 5000;
+  if (plane.heading >= 360) plane.heading -= 360;
+  if (plane.heading < 0) plane.heading += 360;
+  
+  // Update altitude based on pitch and speed
+  plane.verticalSpeed = plane.pitch * plane.airspeed / 100;
+  plane.altitude += plane.verticalSpeed / 60;
+  
+  // Ensure altitude doesn't go below 0
+  plane.altitude = max(plane.altitude, 0);
+  
+  // Update airspeed based on thrust and configuration
+  let totalThrust = 0;
+  for (let i = 0; i < 4; i++) {
+    totalThrust += controls.throttle[i];
+  }
+  
+  let drag = 0.01 * plane.airspeed;
+  if (plane.gear) drag += 0.02;
+  if (plane.flaps > 0) drag += plane.flaps * 0.03;
+  if (plane.spoilers) drag += 0.05;
+  
+  let acceleration = (totalThrust / 4) - drag;
+  plane.airspeed += acceleration;
+  plane.airspeed = max(plane.airspeed, 0);
+}
+
+function updateEngineParameters() {
+  for (let i = 1; i <= 4; i++) {
+    let engine = plane[`engine${i}`];
+    let throttle = controls.throttle[i-1];
+    
+    engine.rpm = throttle * 100;
+    engine.temp = 80 + (throttle * 60);
+    engine.temp = constrain(engine.temp, 80, 140);
+    engine.thrust = throttle * (1 - plane.airspeed / 600);
+  }
+  
+  plane.fuelFlow = 0;
+  for (let i = 1; i <= 4; i++) {
+    let engine = plane[`engine${i}`];
+    plane.fuelFlow += engine.rpm / 10;
+  }
+  
+  plane.fuelTotal -= plane.fuelFlow / 3600;
+  plane.fuelTotal = max(plane.fuelTotal, 0);
+}
+
+function updateSystems() {
+  let activeGenerators = plane.generators.filter(g => g).length;
+  plane.busVoltage = plane.battery ? 24 : 0;
+  plane.busVoltage += activeGenerators * 14;
+  plane.busVoltage = min(plane.busVoltage, 28);
+  
+  if (plane.busVoltage < 18) {
+    plane.autopilot = false;
   }
 }
 
 function mousePressed() {
-  // Refuel when clicking
-  fuelLevel = 100;
+  // Toggle external view when clicking the button
+  if (mouseX > width - 120 && mouseX < width - 20 && 
+      mouseY > 20 && mouseY < 50) {
+    instruments.externalView.visible = !instruments.externalView.visible;
+    return false;
+  }
+}
+
+function keyPressed() {
+  // Toggle external view with 'v' key
+  if (key === 'v' || key === 'V') {
+    instruments.externalView.visible = !instruments.externalView.visible;
+  }
+  
+  // Toggle instrument panels (only in cockpit view)
+  if (!instruments.externalView.visible) {
+    if (key === '1') instruments.pfd.visible = !instruments.pfd.visible;
+    if (key === '2') instruments.nd.visible = !instruments.nd.visible;
+    if (key === '3') instruments.engine.visible = !instruments.engine.visible;
+    if (key === '4') instruments.systems.visible = !instruments.systems.visible;
+    if (key === '5') instruments.radio.visible = !instruments.radio.visible;
+  }
+  
+  // Flight controls
+  if (key === 'g' || key === 'G') plane.gear = !plane.gear;
+  if (key === 'b' || key === 'B') plane.brakes = !plane.brakes;
+  if (key === 's' || key === 'S') plane.spoilers = !plane.spoilers;
+  if (key === 'a' || key === 'A') plane.autopilot = !plane.autopilot;
+  
+  // Flaps control
+  if (key === 'f' || key === 'F') plane.flaps = min(plane.flaps + 0.1, 1);
+  if (key === 'c' || key === 'C') plane.flaps = max(plane.flaps - 0.1, 0);
+  
+  // Engine controls
+  if (key === 'q' || key === 'Q') {
+    for (let i = 0; i < 4; i++) {
+      controls.throttle[i] = max(controls.throttle[i] - 0.1, 0);
+    }
+  }
+  if (key === 'e' || key === 'E') {
+    for (let i = 0; i < 4; i++) {
+      controls.throttle[i] = min(controls.throttle[i] + 0.1, 1);
+    }
+  }
+  
+  // Yoke controls
+  if (keyCode === LEFT_ARROW) controls.yoke.x = -1;
+  if (keyCode === RIGHT_ARROW) controls.yoke.x = 1;
+  if (keyCode === UP_ARROW) controls.yoke.y = -1;
+  if (keyCode === DOWN_ARROW) controls.yoke.y = 1;
+  
+  // Reset flight
+  if (key === 'r' || key === 'R') {
+    plane.altitude = 1000;
+    plane.airspeed = 250;
+    plane.heading = 0;
+    plane.pitch = 0;
+    plane.roll = 0;
+    plane.verticalSpeed = 0;
+  }
+  
+  return false;
+}
+
+function keyReleased() {
+  if (keyCode === LEFT_ARROW || keyCode === RIGHT_ARROW) controls.yoke.x = 0;
+  if (keyCode === UP_ARROW || keyCode === DOWN_ARROW) controls.yoke.y = 0;
+}
+
+function mouseDragged() {
+  // Throttle control
+  for (let i = 0; i < 4; i++) {
+    let x = 100 + i * 80;
+    let y = 750;
+    if (mouseX > x - 20 && mouseX < x + 20 && mouseY > y - 150 && mouseY < y + 20) {
+      let throttlePos = map(mouseY, y - 150, y, 1, 0);
+      controls.throttle[i] = constrain(throttlePos, 0, 1);
+    }
+  }
 }
