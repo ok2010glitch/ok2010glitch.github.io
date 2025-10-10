@@ -9,18 +9,31 @@ function setup() {
 }
 
 function draw() {
-  // background(255);
+  background(255);
   drawBasicGrid(220);
+  // push();
+  // angleMode(DEGREES);
+  // rotate(frameCount + 100)
+
+  // circle(200,200,200);
+  // line(200,200,200,300);
+  // line(200,200,200,100);
+  // line(200,200,300,200);
+  // line(200,200,100,200);
+  // pop();
   push();
   angleMode(DEGREES);
-  rotate(frameCount + 100)
+  translate(600,200)
+  circle(0,0, 300);
+  circle(0,0, 1)
 
-  circle(200,200,200);
-  line(200,200,200,300);
-  line(200,200,200,100);
-  line(200,200,300,200);
-  line(200,200,100,200);
-  pop();
+
+
+  for (let h = 0; h < 360, h++;){
+    line(100,0, 130, 0);
+    // rotate(frameCount + 30);
+  }
+  
   
   
 
