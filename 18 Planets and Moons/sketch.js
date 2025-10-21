@@ -15,9 +15,7 @@ function setup() {
 }
 
 function draw() {
-  noStroke();
-  fill(60,60,60,80);
-  rect(0,0,width,height);
+  background(220);
   myPlanet.display();
 }
 
