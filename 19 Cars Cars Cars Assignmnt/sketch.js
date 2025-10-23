@@ -18,10 +18,10 @@ function setup() {
 
   for (i = 0; i < 20; i++) {
 
-    e = new vehicle(customW / 2, random(100, 275), 0);
+    e = new vehicle(customW / 2, random(100, 270), 0);
     eastbound.push(e);
 
-    w = new vehicle(customW/2, random(customH, 475),2);
+    w = new vehicle(customW/2, random(customH/2 + 5, 465),2);
     westbound.push(w);
 
   }
@@ -63,11 +63,8 @@ class vehicle {
     this.speed = random(1, 5);
     this.d = d
     this.type = int(random(0, 2));
-    this.truckW = int(5)
   }
   //methods
-
-
   display() {
 
     if (this.type === 1) {
@@ -83,13 +80,18 @@ class vehicle {
     //   rect(this.x - 65.5, this.y + 3, -30, 34)
 
     // }
-    else {
+    else{
+    if(this.d === 0){
       fill(this.c);
       rect(this.x, this.y, 65, 40);
-      rect(this.x + 65.5, this.y + 3, 30, 34)
-
+      rect(this.x + 65.5, this.y + 3, 30, 34);      
+    }
+    if(this.d === 2){
+      rect(this.x, this.y, -65, 40);
+      rect(this.x - 65.5, this.y + 3, -30, 34);
     }
   }
+}
   move() {
     if (this.d === 0) {
       this.x += this.speed;
@@ -99,8 +101,8 @@ class vehicle {
     }
     else if(this.d === 2){
       this.x -= this.speed;
-      if(this.x < customW){
-        this.x = 915;
+      if(this.x < 0){
+        this.x = customW + 15;
       }
     }
   }
