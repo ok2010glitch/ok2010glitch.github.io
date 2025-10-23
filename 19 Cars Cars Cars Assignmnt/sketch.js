@@ -5,27 +5,25 @@
 // Global Variables
 let e;
 let w;
-let customW = 900;
-let customH = 600;
+let customW = 900; //my custom width for canvas
+let customH = 600;// my custom height for canvas
 
 let westbound = [];
 let eastbound = [];
 
-
 function setup() {
   createCanvas(customW, customH);
-
-
   for (i = 0; i < 20; i++) {
-
-    e = new vehicle(customW / 2, random(100, 275), 0);
-    eastbound.push(e);
-
-    w = new vehicle(customW/2, random(customH, 475),2);
+    e = new vehicle(0, random(100, 270), 0);
+    eastbound.push(e)
+    w = new vehicle(customW, random(customH/2, 465), 1);
     westbound.push(w);
-
   }
+  
+
+  
 }
+
 
 function draw() {
   randomSeed(1);
@@ -36,13 +34,10 @@ function draw() {
    e.move(); 
   }
   for(let w of westbound){
-    w.display();
-    w.move();
-
-
+   w.display();
+   w.move();
   }
-  
-
+  // e.speedUp();
 }
 
 function drawRoad() {
@@ -63,32 +58,38 @@ class vehicle {
     this.speed = random(1, 5);
     this.d = d
     this.type = int(random(0, 2));
-    this.truckW = int(5)
   }
-  //methods
-
-
+  //2. Function Method
   display() {
-
-    if (this.type === 1) {
+    if (this.type === 1){
       fill("black");
       rect(this.x + 1, this.y - 4, 10, 38);
       rect(this.x + 49, this.y - 4, 10, 38);
       fill(this.c);
       rect(this.x, this.y, 60, 30);
-
     }
-    // else if(this.type === 5){
-    //   rect(this.x, this.y, -65, 40);
-    //   rect(this.x - 65.5, this.y + 3, -30, 34)
 
-    // }
     else {
-      fill(this.c);
-      rect(this.x, this.y, 65, 40);
-      rect(this.x + 65.5, this.y + 3, 30, 34)
+      if(this.d === 0){
+        fill(this.c);
+        rect(this.x, this.y, 65, 40);
+        rect(this.x + 65.5, this.y + 3, 30, 34);      
+      }
+      if(this.d === 1){
+        rect(this.x, this.y, -65, 40);
+        rect(this.x - 65.5, this.y + 3, -30, 34);
+      }
 
     }
+  }
+  speedUp(){
+    if(keyIsPressed(RIGHT_ARROW)){
+      this.speed += 1;
+      if(this.speed === 15){
+        this.speed = 15;
+      }
+    }
+    
   }
   move() {
     if (this.d === 0) {
@@ -97,10 +98,10 @@ class vehicle {
         this.x = 0;
       }
     }
-    else if(this.d === 2){
+    else if(this.d === 1){
       this.x -= this.speed;
-      if(this.x < customW){
-        this.x = 915;
+      if(this.x < 0){
+        this.x = customW + 15;
       }
     }
   }
