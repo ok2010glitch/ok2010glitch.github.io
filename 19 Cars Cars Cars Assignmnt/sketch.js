@@ -5,7 +5,7 @@
 // Global Variables
 let e;
 let w;
-let customW = 900;
+let customW = 1000;
 let customH = 600;
 
 let westbound = [];
@@ -18,17 +18,17 @@ function setup() {
 
   for (i = 0; i < 20; i++) {
 
-    e = new vehicle(customW / 2, random(100, 270), 0);
+    e = new vehicle(random(0,customW), random(95, customH/2 - 40), 0);
     eastbound.push(e);
 
-    w = new vehicle(customW/2, random(customH/2 + 5, 465),2);
+    w = new vehicle(random(0,customW), random(customH/2 + 5, 465),2);
     westbound.push(w);
 
   }
 }
 
 function draw() {
-  randomSeed(1);
+  //randomSeed(1);
   background(255, 216, 161);
   drawRoad();
   for(let e of eastbound){
@@ -36,14 +36,10 @@ function draw() {
    e.move(); 
   }
   for(let w of westbound){
-    w.display();
-    w.move();
-
-
+    w.action();
   }
-  
-
 }
+
 
 function drawRoad() {
   fill("grey")
@@ -63,6 +59,7 @@ class vehicle {
     this.speed = random(1, 5);
     this.d = d
     this.type = int(random(0, 2));
+    
   }
   //methods
   display() {
@@ -75,11 +72,6 @@ class vehicle {
       rect(this.x, this.y, 60, 30);
 
     }
-    // else if(this.type === 5){
-    //   rect(this.x, this.y, -65, 40);
-    //   rect(this.x - 65.5, this.y + 3, -30, 34)
-
-    // }
     else{
     if(this.d === 0){
       fill(this.c);
@@ -105,5 +97,43 @@ class vehicle {
         this.x = customW + 15;
       }
     }
+  }
+  SpeedUp(){
+    if(this.d === 0 && this.speed < 6){
+      this.speed += 0.5;
+      if(this.speed > 15){
+        this.speed = 15;
+
+      }
+    }
+   }
+   SpeedDown(){
+    if(this.d === 0 && this.speed < 14){
+      this.speed -= 0.05;
+      if(this.speed < 1){
+        this.speed = 1;
+      }
+    }
+  }
+      
+   action(){
+    this.move();
+    this.display();
+    let chance = int(random(0,100));
+    print(chance)
+    if(chance === 1){
+      this.SpeedUp();
+    }
+    
+    else if(chance === 1){
+      this.SpeedDown();
+
+    }  
+      this.SpeedDown()
+      print("Speed: ")
+   
+      
+    
+    
   }
 }
