@@ -32,8 +32,7 @@ function draw() {
   background(255, 216, 161);
   drawRoad();
   for(let e of eastbound){
-   e.display();
-   e.move(); 
+   e.action(); 
   }
   for(let w of westbound){
     w.action();
