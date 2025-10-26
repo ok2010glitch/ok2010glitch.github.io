@@ -5,6 +5,8 @@
 // Global Variables
 let e;
 let w;
+let traffic;
+
 let customW = 900; //my custom width for canvas
 let customH = 600;// my custom height for canvas
 
@@ -14,11 +16,13 @@ let eastbound = [];
 function setup() {
   createCanvas(customW, customH);
   for (i = 0; i < 20; i++) {
-    e = new vehicle(0, random(100, 270), 0);
-    eastbound.push(e)
-    w = new vehicle(customW, random(customH/2, 465), 1);
+    e = new vehicle(random(0,customW), random(95, customH/2 - 40), 0);
+    eastbound.push(e);
+
+    w = new vehicle(random(0,customW), random(customH/2 + 5, 460),2);
     westbound.push(w);
   }
+  traffic = new trafficLight(500,50)
   
 
   
@@ -26,19 +30,19 @@ function setup() {
 
 
 function draw() {
-  randomSeed(1);
+  //randomSeed(1);
   background(255, 216, 161);
   drawRoad();
   for(let e of eastbound){
-   e.display();
-   e.move(); 
+    e.action();
   }
   for(let w of westbound){
-   w.display();
-   w.move();
-  }
-  // e.speedUp();
+   w.action();
 }
+traffic.update();
+}
+
+
 
 function drawRoad() {
   fill("grey")
@@ -49,19 +53,43 @@ function drawRoad() {
   }
 
 }
+function keyPressed(){
+  if(key === ' '){
+    traffic.turnRed();
+       
+  }
+
+}
+function mousePressed(){
+  if(keyIsDown(SHIFT)){
+    e = new vehicle(random(0,customW), random(105, customH/2 - 40), 0);
+    e.speed = 4
+    eastbound.push(e);
+
+  }else{
+    w = new vehicle(random(0,customW), random(customH/2 + 5, 460),2);
+    w.speed = 4;
+    westbound.push(w);
+    
+  }
+}
+
 
 class vehicle {
   //1. Constructor
   constructor(x, y, d) {
     this.x = x; this.y = y;
-    this.c = color(random(255),random(255),random(255));
-    this.speed = random(1, 5);
-    this.d = d
+    this.speed = 4;
+    this.d = d;
     this.type = int(random(0, 2));
+    this.c = color(random(255),random(255),random(255));
   }
   //2. Function Method
+
+  //methods
+
   display() {
-    if (this.type === 1){
+    if (this.type === 0){
       fill("black");
       rect(this.x + 1, this.y - 4, 10, 38);
       rect(this.x + 49, this.y - 4, 10, 38);
@@ -75,7 +103,8 @@ class vehicle {
         rect(this.x, this.y, 65, 40);
         rect(this.x + 65.5, this.y + 3, 30, 34);      
       }
-      if(this.d === 1){
+      if(this.d === 2){
+        fill(this.c);
         rect(this.x, this.y, -65, 40);
         rect(this.x - 65.5, this.y + 3, -30, 34);
       }
@@ -83,26 +112,91 @@ class vehicle {
     }
   }
   speedUp(){
-    if(keyIsPressed(RIGHT_ARROW)){
-      this.speed += 1;
-      if(this.speed === 15){
-        this.speed = 15;
-      }
+    if( this.speed < 15){
+      this.speed += 0.05;
     }
-    
   }
+  SpeedDown(){
+    if(this.speed > 1){
+      this.speed -= 0.05;
+    }
+  }
+  changeColor(){
+    this.c = color(random(255),random(255),random(255));
+  }
+
   move() {
+    if(traffic.state === "red"){
+      return;
+    }
     if (this.d === 0) {
       this.x += this.speed;
       if(this.x > customW){
-        this.x = 0;
+        this.x = 0
       }
     }
-    else if(this.d === 1){
+    else if(this.d === 2){
       this.x -= this.speed;
       if(this.x < 0){
-        this.x = customW + 15;
+        this.x = customW + 20
       }
+      
     }
   }
+
+
+
+      
+action(){
+
+  this.display();
+  this.move();
+  if(random(100) < 1){
+    this.speedUp();
+  }
+  if(random(100) < 1){
+    this.SpeedDown();
+  }
+  if(random(100) < 1){
+    this.changeColor();
+  }
+}
+}
+
+
+class trafficLight{
+  //1. constructor
+  constructor(x,y){
+    this.x = x; this.y = y;
+    this.state = "green"
+    this.time = 0; 
+
+  }
+
+  display(){
+    if(this.state === "green"){
+      fill("green");
+    }
+    else{
+      fill("red")
+    }
+    circle(this.x + 25, this.y + 10, 45)
+
+
+  }
+turnRed(){
+  if(this.state === "green"){
+    this.state = "red";
+    this.time = 120; // meaning 2 seconds
+  }
+}
+update(){
+  if(this.state === "red"){
+    this.time --;
+    if(this.time <= 0){
+      this.state = "green";
+    }
+  }
+  this.display();
+}
 }
