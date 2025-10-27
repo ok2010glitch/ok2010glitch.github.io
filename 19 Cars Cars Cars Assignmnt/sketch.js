@@ -15,7 +15,7 @@ let eastbound = [];
 
 function setup() {
   createCanvas(customW, customH);
-  for (i = 0; i < 20; i++) {
+  for (i = 0; i < 20; i++) { // Intially cars start with 20
     e = new vehicle(random(0,customW), random(95, customH/2 - 40), 0);
     eastbound.push(e);
 
@@ -30,6 +30,7 @@ function setup() {
 
 
 function draw() {
+  noStroke();
   //randomSeed(1);
   background(255, 216, 161);
   drawRoad();
@@ -60,13 +61,14 @@ function keyPressed(){
   }
 
 }
+// Adding Cars
 function mousePressed(){
-  if(keyIsDown(SHIFT)){
+  if(keyIsDown(SHIFT)){ // For East
     e = new vehicle(random(0,customW), random(105, customH/2 - 40), 0);
     e.speed = 4
     eastbound.push(e);
 
-  }else{
+  }else{ // For West
     w = new vehicle(random(0,customW), random(customH/2 + 5, 460),2);
     w.speed = 4;
     westbound.push(w);
@@ -99,11 +101,13 @@ class vehicle {
 
     else {
       if(this.d === 0){
+        // Eastbound 
         fill(this.c);
         rect(this.x, this.y, 65, 40);
         rect(this.x + 65.5, this.y + 3, 30, 34);      
       }
       if(this.d === 2){
+        //West Bound
         fill(this.c);
         rect(this.x, this.y, -65, 40);
         rect(this.x - 65.5, this.y + 3, -30, 34);
@@ -192,7 +196,7 @@ turnRed(){
 }
 update(){
   if(this.state === "red"){
-    this.time --;
+    this.time --; // timer for traffic
     if(this.time <= 0){
       this.state = "green";
     }
