@@ -178,7 +178,7 @@ class trafficLight{
       fill("green");
     }
     else{
-      fill("red")
+      fill("red")// turn's red
     }
     circle(this.x + 25, this.y + 10, 45)
 
@@ -192,7 +192,7 @@ turnRed(){
 }
 update(){
   if(this.state === "red"){
-    this.time --;
+    this.time --; // dcreases the time
     if(this.time <= 0){
       this.state = "green";
     }
