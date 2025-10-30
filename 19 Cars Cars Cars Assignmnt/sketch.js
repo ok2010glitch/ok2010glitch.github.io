@@ -16,10 +16,10 @@ let eastbound = [];
 function setup() {
   createCanvas(customW, customH);
   for (i = 0; i < 20; i++) { // Intially cars start with 20
-    e = new vehicle(random(0,customW), random(95, customH/2 - 40), 0);
+    e = new vehicle(random(0,customW), random(customH - 495, customH/2 - 40), 0);
     eastbound.push(e);
 
-    w = new vehicle(random(0,customW), random(customH/2 + 5, 460),2);
+    w = new vehicle(random(0,customW), random(customH/2 + 5, customH - 160),2);
     westbound.push(w);
   }
   traffic = new trafficLight(500,50)
@@ -47,43 +47,48 @@ traffic.update();
 
 function drawRoad() {
   fill("grey")
-  rect(0, 100, width, 400);
+  rect(0, customH - 500, width, 400);
   fill("white");
   for (i = 0; i < 1000; i = i + 30 * 2.5) {
-    rect(i, 300, 50, 5);
+    rect(i, customH - 300, 50, 5);
   }
 
 }
+
+// Toggle Trafic Light controls
 function keyPressed(){
-  if(key === ' '){
+  if(key === ' '){ // When space is pressed
     traffic.turnRed();
        
   }
 
 }
+
 // Adding Cars
 function mousePressed(){
-  if(keyIsDown(SHIFT)){ // For East
-    e = new vehicle(random(0,customW), random(105, customH/2 - 40), 0);
-    e.speed = 4
-    eastbound.push(e);
-
-  }else{ // For West
+  // add cars for westbound
+  if(keyIsDown(SHIFT)){ 
     w = new vehicle(random(0,customW), random(customH/2 + 5, 460),2);
     w.speed = 4;
     westbound.push(w);
+  }
+  // adding cars for eastbound
+  else{ 
+    e = new vehicle(random(0,customW), random(95, customH/2 - 40), 0);
+    e.speed = 4;
+    eastbound.push(e);
     
   }
 }
 
-
+// Trucks and Cars
 class vehicle {
   //1. Constructor
   constructor(x, y, d) {
     this.x = x; this.y = y;
     this.speed = 4;
     this.d = d;
-    this.type = int(random(0, 2));
+    this.type = int(random(0, 2)); // chooses randomly between cars
     this.c = color(random(255),random(255),random(255));
   }
   //2. Function Method
@@ -98,16 +103,16 @@ class vehicle {
       fill(this.c);
       rect(this.x, this.y, 60, 30);
     }
-
+    // Trucks
     else {
-      if(this.d === 0){
-        // Eastbound 
+      // Eastbound
+      if(this.d === 0){ 
         fill(this.c);
         rect(this.x, this.y, 65, 40);
         rect(this.x + 65.5, this.y + 3, 30, 34);      
       }
+      //West Bound
       if(this.d === 2){
-        //West Bound
         fill(this.c);
         rect(this.x, this.y, -65, 40);
         rect(this.x - 65.5, this.y + 3, -30, 34);
@@ -150,9 +155,8 @@ class vehicle {
 
 
 
-      
+// Main Calling Function     
 action(){
-
   this.display();
   this.move();
   if(random(100) < 1){
@@ -167,7 +171,7 @@ action(){
 }
 }
 
-
+// Traffic Light
 class trafficLight{
   //1. constructor
   constructor(x,y){
