@@ -23,9 +23,6 @@ function setup() {
     westbound.push(w);
   }
   traffic = new trafficLight(500,50)
-  
-
-  
 }
 
 
@@ -44,12 +41,12 @@ traffic.update();
 }
 
 
-
+// Road
 function drawRoad() {
   fill("grey")
   rect(0, customH - 500, width, 400);
   fill("white");
-  for (i = 0; i < 1000; i = i + 30 * 2.5) {
+  for (i = 0; i < 1000; i = i + 30 * 2.5) { // division lines of the road
     rect(i, customH - 300, 50, 5);
   }
 
@@ -69,13 +66,13 @@ function mousePressed(){
   // add cars for westbound
   if(keyIsDown(SHIFT)){ 
     w = new vehicle(random(0,customW), random(customH/2 + 5, 460),2);
-    w.speed = 4;
+    w.speed = 4; // resetting the speed after every stop
     westbound.push(w);
   }
   // adding cars for eastbound
   else{ 
     e = new vehicle(random(0,customW), random(95, customH/2 - 40), 0);
-    e.speed = 4;
+    e.speed = 4; // resetting the speed
     eastbound.push(e);
     
   }
@@ -93,9 +90,8 @@ class vehicle {
   }
   //2. Function Method
 
-  //methods
-
   display() {
+    /// cars
     if (this.type === 0){
       fill("black");
       rect(this.x + 1, this.y - 4, 10, 38);
@@ -120,11 +116,13 @@ class vehicle {
 
     }
   }
+  // Speed Up
   speedUp(){
     if( this.speed < 15){
       this.speed += 0.05;
     }
   }
+  // Speed Down
   SpeedDown(){
     if(this.speed > 1){
       this.speed -= 0.05;
@@ -158,7 +156,9 @@ class vehicle {
 // Main Calling Function     
 action(){
   this.display();
+  // For moving in an opposite direction
   this.move();
+  // One precent chnace everything occring
   if(random(100) < 1){
     this.speedUp();
   }
@@ -188,16 +188,18 @@ class trafficLight{
     else{
       fill("red")
     }
-    circle(this.x + 25, this.y + 10, 45)
+    circle(this.x + 25, this.y + 10, 45) // Traffic light's circle
 
 
   }
+// when space is pressed
 turnRed(){
   if(this.state === "green"){
     this.state = "red";
     this.time = 120; // meaning 2 seconds
   }
 }
+// updates every time
 update(){
   if(this.state === "red"){
     this.time --; // timer for traffic
