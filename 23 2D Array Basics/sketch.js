@@ -4,16 +4,13 @@
 
 // 0 (Black) 255 (white)
 
-let grid = [
-  [ 0,   255  ,  0,    255 ,   0],
-  [255,   0,    255,    0 ,   255],
-  [255,  255 ,   0  ,  255 ,  255],
-  [ 0,   255,   0,    255,     0],
+let pattern;
+pattern = [0,255];
 
-];
+let grid = [[],[]];
 
-let rows = grid.length;
-let cols = grid[3].length;
+let rows;
+let cols; 
 
 let squareSize = 60;
 
@@ -39,7 +36,17 @@ function flip(x,y){
   else grid[y][x] = 0;
 }
 function setup() {
-  createCanvas(cols*squareSize, rows*squareSize);
+  createCanvas(windowWidth, windowHeight)
+  grid = [
+    [random(pattern), random(pattern), random(pattern), random(pattern),random(pattern)],
+    [random(pattern), random(pattern), random(pattern), random(pattern),random(pattern)],
+    [random(pattern), random(pattern), random(pattern), random(pattern),random(pattern)],
+    [random(pattern), random(pattern), random(pattern), random(pattern),random(pattern)],
+    [random(pattern), random(pattern), random(pattern), random(pattern),random(pattern)]
+  
+  ];
+  rows = grid.length;
+  cols = grid[0].length;
 }
 
 function draw() {
@@ -70,5 +77,21 @@ function mousePressed(){
   let y = getCurrentY();
 
   //ALWAYS: flip the "focused title"
-  flip(x,y);
+  if(keyIsDown(SHIFT)){
+    flip(x,y);
+
+  }
+  else{
+    if(x+1 < cols)flip(x+1,y);
+    if(x-1 >= 0)flip(x-1,y);
+    if(y+1 < rows)flip(x,y+1);
+    if(y -1 >= 0)flip(x,y-1);
+
+
+  }
+
+  //IF THEY EXIST:
+  //fli our NSEW neighbours (cross pattern)
+  
+
 }
