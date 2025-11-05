@@ -52,10 +52,19 @@ function setup() {
 function draw() {
   background(200);
   renderGrid();
+  Overlay();
   print(getCurrentX(), getCurrentY());
 
 }
-
+function Overlay(){
+  let x = getCurrentX();
+  let y = getCurrentY();
+  fill(255,0,0,100);
+  square(x*squareSize ,y*squareSize,squareSize);
+  
+  
+  
+}
 function renderGrid(){
   // interpret the information in the 2D array
   // a grid of square on the screen to reflect it.
@@ -82,12 +91,11 @@ function mousePressed(){
 
   }
   else{
-    if(x+1 < cols)flip(x+1,y);
+    if(x < cols)flip(x,y);
+    if(x+1 < cols)flip(x+1,y)
     if(x-1 >= 0)flip(x-1,y);
     if(y+1 < rows)flip(x,y+1);
     if(y -1 >= 0)flip(x,y-1);
-
-
   }
 
   //IF THEY EXIST:
