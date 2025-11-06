@@ -19,6 +19,7 @@ let eastbound = [];
 function setup() {
   createCanvas(customW, customH);
   for (i = 0; i < 20; i++) { // Intially cars start with 20
+<<<<<<< HEAD
     e = new vehicle(random(0,customW), random(100, customH/2 - 40), 0);
     eastbound.push(e);
 
@@ -27,6 +28,15 @@ function setup() {
   }
   traffic = new trafficLight(500,50)
 
+=======
+    e = new vehicle(random(0,customW), random(customH - 495, customH/2 - 40), 0);
+    eastbound.push(e);
+
+    w = new vehicle(random(0,customW), random(customH/2 + 5, customH - 160),2);
+    westbound.push(w);
+  }
+  traffic = new trafficLight(500,50)
+>>>>>>> 6b9d8b468491db0678aeb3f53a3579139f34d5fc
 }
 
 function draw() {
@@ -45,26 +55,37 @@ function draw() {
 traffic.update();
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 6b9d8b468491db0678aeb3f53a3579139f34d5fc
 // Road
 function drawRoad() {
   fill("grey")
-  rect(0, 100, width, 400);
+  rect(0, customH - 500, width, 400);
   fill("white");
-  for (i = 0; i < 1000; i = i + 30 * 2.5) {
-    rect(i, 300, 50, 5);
+  for (i = 0; i < 1000; i = i + 30 * 2.5) { // division lines of the road
+    rect(i, customH - 300, 50, 5);
   }
 
 }
 
+<<<<<<< HEAD
 // Traffic Light
 function keyPressed(){
   if(key === ' '){ // When Space Pressed
+=======
+// Toggle Trafic Light controls
+function keyPressed(){
+  if(key === ' '){ // When space is pressed
+>>>>>>> 6b9d8b468491db0678aeb3f53a3579139f34d5fc
     traffic.turnRed();
        
   }
 
 }
 
+<<<<<<< HEAD
 
 // Adding Cars
 function mousePressed(){
@@ -79,24 +100,50 @@ function mousePressed(){
     e.speed = 4; 
     eastbound.push(e);
     
+=======
+// Adding Cars
+function mousePressed(){
+  // add cars for westbound
+  if(keyIsDown(SHIFT)){ 
+    w = new vehicle(random(0,customW), random(customH/2 + 5, 460),2);
+    w.speed = 4; // resetting the speed after every stop
+    westbound.push(w);
+  }
+  // adding cars for eastbound
+  else{ 
+    e = new vehicle(random(0,customW), random(95, customH/2 - 40), 0);
+    e.speed = 4; // resetting the speed
+    eastbound.push(e);
+>>>>>>> 6b9d8b468491db0678aeb3f53a3579139f34d5fc
     
   }
 }
 
-
+// Trucks and Cars
 class vehicle {
   //1. Constructor
   constructor(x, y, d) {
     this.x = x; this.y = y;
     this.speed = 4;
+<<<<<<< HEAD
     this.d = d; // 0 = East ; 2 = West
     this.type = int(random(0, 2));
+=======
+    this.d = d;
+    this.type = int(random(0, 2)); // chooses randomly between cars
+>>>>>>> 6b9d8b468491db0678aeb3f53a3579139f34d5fc
     this.c = color(random(255),random(255),random(255));
   }
   
   //2. Function Method
+<<<<<<< HEAD
  display() {
     // Cars
+=======
+
+  display() {
+    /// cars
+>>>>>>> 6b9d8b468491db0678aeb3f53a3579139f34d5fc
     if (this.type === 0){
       fill("black");
       rect(this.x + 1, this.y - 4, 10, 38);
@@ -104,16 +151,25 @@ class vehicle {
       fill(this.c);
       rect(this.x, this.y, 60, 30);
     }
-
+    // Trucks
     else {
+<<<<<<< HEAD
       // Trucks
       // (Eastbound)
       if(this.d === 0){
+=======
+      // Eastbound
+      if(this.d === 0){ 
+>>>>>>> 6b9d8b468491db0678aeb3f53a3579139f34d5fc
         fill(this.c);
         rect(this.x, this.y, 65, 40);
         rect(this.x + 65.5, this.y + 3, 30, 34);      
       }
+<<<<<<< HEAD
       //(West Bound)
+=======
+      //West Bound
+>>>>>>> 6b9d8b468491db0678aeb3f53a3579139f34d5fc
       if(this.d === 2){
         fill(this.c);
         rect(this.x, this.y, -65, 40);
@@ -122,11 +178,13 @@ class vehicle {
 
     }
   }
+  // Speed Up
   speedUp(){
     if( this.speed < 15){
       this.speed += 0.05;
     }
   }
+  // Speed Down
   SpeedDown(){
     if(this.speed > 1){
       this.speed -= 0.05;
@@ -158,15 +216,25 @@ class vehicle {
 
 
 
+<<<<<<< HEAD
 // MAIN CALLING FUNCTION     
 
+=======
+// Main Calling Function     
+>>>>>>> 6b9d8b468491db0678aeb3f53a3579139f34d5fc
 action(){
   this.display();
+  // For moving in an opposite direction
   this.move();
+<<<<<<< HEAD
   
   // 1% of everything happening
   
   if(random(100) < 1){ // speed up
+=======
+  // One precent chnace everything occring
+  if(random(100) < 1){
+>>>>>>> 6b9d8b468491db0678aeb3f53a3579139f34d5fc
     this.speedUp();
   }
   if(random(100) < 1){ // speed down
@@ -178,8 +246,12 @@ action(){
 }
 }
 
+<<<<<<< HEAD
 
 
+=======
+// Traffic Light
+>>>>>>> 6b9d8b468491db0678aeb3f53a3579139f34d5fc
 class trafficLight{
   //1. constructor
   constructor(x,y){
@@ -196,17 +268,26 @@ class trafficLight{
     else{
       fill("red")// turn's red
     }
+<<<<<<< HEAD
     circle(this.x + 25, this.y + 10, 55);
+=======
+    circle(this.x + 25, this.y + 10, 45) // Traffic light's circle
+>>>>>>> 6b9d8b468491db0678aeb3f53a3579139f34d5fc
 
 
   }
+// when space is pressed
 turnRed(){
   if(this.state === "green"){
     this.state = "red";
     this.time = 120; // meaning 2 seconds
   }
 }
+<<<<<<< HEAD
 // Updates every time it occurs
+=======
+// updates every time
+>>>>>>> 6b9d8b468491db0678aeb3f53a3579139f34d5fc
 update(){
   if(this.state === "red"){
     this.time --; // timer for traffic
