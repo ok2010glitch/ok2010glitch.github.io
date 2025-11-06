@@ -13,6 +13,14 @@ function setup() {
   rectMode(CENTER);
   mySquare = new Bouncer(width/2, height/2);
   textSize(30);
+  textAlign(CENTER,CENTER)
+
+  if(localStorage.getItem("numBounces") === null){
+    localStorage.setItelm("newBounces", 0);
+}
+else{
+  totalBounces = int(localStorage.getItem("numBounces"));
+}
 }
 
 function draw() {
@@ -45,11 +53,13 @@ class Bouncer{
     if(this.x < 0 || this.x > width){
       this.xSpeed *= -1;
       totalBounces ++;
+      localStorage.setItem("numBOunces", totalBounces);
     }
 
     if(this.y < 0 || this.y > height){
       this.ySpeed *= -1;
       totalBounces++;
+      localStorage.setItem("newBounces",totalBounces);
     }
   }
 }

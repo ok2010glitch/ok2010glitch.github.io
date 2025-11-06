@@ -2,37 +2,40 @@
 // Syed Saad Hussain
 // October 20, 2025
 
+// Goal is to make a traffic simulation with alot of different types
+// of Vehicles 
+
 // Global Variables
 let e;
 let w;
 let traffic;
 
-let customW = 900; //my custom width for canvas
-let customH = 600;// my custom height for canvas
+let customW = 900; // Canvas Width
+let customH = 600; // Canvas Height
 
 let westbound = [];
 let eastbound = [];
 
 function setup() {
   createCanvas(customW, customH);
-  for (i = 0; i < 20; i++) {
-    e = new vehicle(random(0,customW), random(95, customH/2 - 40), 0);
+  for (i = 0; i < 20; i++) { // Intially cars start with 20
+    e = new vehicle(random(0,customW), random(100, customH/2 - 40), 0);
     eastbound.push(e);
 
-    w = new vehicle(random(0,customW), random(customH/2 + 5, 460),2);
+    w = new vehicle(random(0,customW), random(customH/2 + 10, 460),2);
     westbound.push(w);
   }
   traffic = new trafficLight(500,50)
-  
 
-  
 }
 
-
 function draw() {
+  noStroke();
   //randomSeed(1);
   background(255, 216, 161);
+  // Road
   drawRoad();
+  // Cars generator
   for(let e of eastbound){
     e.action();
   }
@@ -42,8 +45,7 @@ function draw() {
 traffic.update();
 }
 
-
-
+// Road
 function drawRoad() {
   fill("grey")
   rect(0, 100, width, 400);
@@ -53,23 +55,30 @@ function drawRoad() {
   }
 
 }
+
+// Traffic Light
 function keyPressed(){
-  if(key === ' '){
+  if(key === ' '){ // When Space Pressed
     traffic.turnRed();
        
   }
 
 }
-function mousePressed(){
-  if(keyIsDown(SHIFT)){
-    e = new vehicle(random(0,customW), random(105, customH/2 - 40), 0);
-    e.speed = 4
-    eastbound.push(e);
 
-  }else{
-    w = new vehicle(random(0,customW), random(customH/2 + 5, 460),2);
-    w.speed = 4;
-    westbound.push(w);
+
+// Adding Cars
+function mousePressed(){
+  if(keyIsDown(SHIFT)){ // For West
+    w = new vehicle(random(0,customW), random(customH/2 + 10, 460),2);
+    w.speed = 4; // resetting the speed
+    westbound.push(w); 
+    
+
+  }else{ // For East
+    e = new vehicle(random(0,customW), random(100, customH/2 - 40), 0);
+    e.speed = 4; 
+    eastbound.push(e);
+    
     
   }
 }
@@ -80,15 +89,14 @@ class vehicle {
   constructor(x, y, d) {
     this.x = x; this.y = y;
     this.speed = 4;
-    this.d = d;
+    this.d = d; // 0 = East ; 2 = West
     this.type = int(random(0, 2));
     this.c = color(random(255),random(255),random(255));
   }
+  
   //2. Function Method
-
-  //methods
-
-  display() {
+ display() {
+    // Cars
     if (this.type === 0){
       fill("black");
       rect(this.x + 1, this.y - 4, 10, 38);
@@ -98,11 +106,14 @@ class vehicle {
     }
 
     else {
+      // Trucks
+      // (Eastbound)
       if(this.d === 0){
         fill(this.c);
         rect(this.x, this.y, 65, 40);
         rect(this.x + 65.5, this.y + 3, 30, 34);      
       }
+      //(West Bound)
       if(this.d === 2){
         fill(this.c);
         rect(this.x, this.y, -65, 40);
@@ -126,19 +137,20 @@ class vehicle {
   }
 
   move() {
+    // Traffic Light condition
     if(traffic.state === "red"){
-      return;
+      return; // Does nothing, but makes all cars stop
     }
     if (this.d === 0) {
       this.x += this.speed;
       if(this.x > customW){
-        this.x = 0
+        this.x = 0;
       }
     }
     else if(this.d === 2){
       this.x -= this.speed;
       if(this.x < 0){
-        this.x = customW + 20
+        this.x = customW + 20;
       }
       
     }
@@ -146,33 +158,37 @@ class vehicle {
 
 
 
-      
-action(){
+// MAIN CALLING FUNCTION     
 
+action(){
   this.display();
   this.move();
-  if(random(100) < 1){
+  
+  // 1% of everything happening
+  
+  if(random(100) < 1){ // speed up
     this.speedUp();
   }
-  if(random(100) < 1){
+  if(random(100) < 1){ // speed down
     this.SpeedDown();
   }
-  if(random(100) < 1){
+  if(random(100) < 1){ // changing color
     this.changeColor();
   }
 }
 }
 
 
+
 class trafficLight{
   //1. constructor
   constructor(x,y){
     this.x = x; this.y = y;
-    this.state = "green"
+    this.state = "green";
     this.time = 0; 
 
   }
-
+  //2. Function Method
   display(){
     if(this.state === "green"){
       fill("green");
@@ -180,7 +196,7 @@ class trafficLight{
     else{
       fill("red")// turn's red
     }
-    circle(this.x + 25, this.y + 10, 45)
+    circle(this.x + 25, this.y + 10, 55);
 
 
   }
@@ -190,9 +206,10 @@ turnRed(){
     this.time = 120; // meaning 2 seconds
   }
 }
+// Updates every time it occurs
 update(){
   if(this.state === "red"){
-    this.time --; // dcreases the time
+    this.time --; // timer for traffic
     if(this.time <= 0){
       this.state = "green";
     }
