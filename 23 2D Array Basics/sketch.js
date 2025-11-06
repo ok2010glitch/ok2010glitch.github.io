@@ -4,7 +4,6 @@
 
 // 0 (Black) 255 (white)
 
-let isSquare = 0;
 
 let pattern;
 pattern = [0,255];
@@ -55,37 +54,64 @@ function draw() {
   background(200);
   renderGrid();
   Overlay();
+  switching();
   print(getCurrentX(), getCurrentY());
+
+}
+let isSquare;
+
+
+function switching(){
+  if(key === ' '){
+    isSquare = 0;
+  }
+  else if (isSquare === 0 && key === ' '){
+    isSquare = 2;
+    if(key === ' '){
+      isSquare = 1;
+    }
+    
+  }
+  else{
+    isSquare = 1;
+  }
 
 }
 function Overlay(){
   let x = getCurrentX();
   let y = getCurrentY();
   fill(255,0,0,100);
-  if(isSquare === 0 && key === ' '){
+  if(keyIsDown(SHIFT)){
+    fill(255,0,0,100);
+    square(x*squareSize,y*squareSize,squareSize);
+  }
+
+  else if(isSquare === 0){
   square(x*squareSize,y*squareSize,squareSize);
   if(x+1 < cols)square((x+1)*squareSize, y*squareSize, squareSize);
   if(y+1 < rows)square(x*squareSize,(y+1)*squareSize,squareSize);
   if(y+1 < rows && x + 1 < cols)square((x+1)*squareSize,(y+1)*squareSize,squareSize);
+  isSquare = 1;
   }
-  else{
+  else if(isSquare === 1){
     fill(255,0,0,100);
     square(x*squareSize ,y*squareSize,squareSize);
     if(x+1 < cols)square((x+1)*squareSize, y*squareSize, squareSize);
     if(x>= 0)square((x-1)*squareSize,y*squareSize,squareSize);
     if(y+1 < rows)square(x*squareSize,(y+1)*squareSize,squareSize);
-    if(y-1 >= 0)square(x*squareSize,(y-1)*squareSize,squareSize);
-  
-
+    if(y-1 >= 0)square(x*squareSize,(y-1)*squareSize,squareSize)
+    isSquare = 0;
+    
   }
-  
-  
-  
-  
-  
-  
-  
-  
+  else if(isSquare === 2){
+    fill(255,0,0,100);
+    square(x*squareSize ,y*squareSize,squareSize);
+    if(x+1 < cols)square((x+1)*squareSize, y*squareSize, squareSize);
+    if(x>= 0)square((x-1)*squareSize,y*squareSize,squareSize);
+    if(y+1 < rows)square(x*squareSize,(y+1)*squareSize,squareSize);
+    if(y-1 >= 0)square(x*squareSize,(y-1)*squareSize,squareSize)
+  }
+
 }
 function renderGrid(){
   // interpret the information in the 2D array
