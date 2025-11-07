@@ -14,6 +14,7 @@ let rows;
 let cols; 
 
 let squareSize = 60;
+let maxSq;
 
 
 function getCurrentX(){
@@ -54,44 +55,33 @@ function draw() {
   background(200);
   renderGrid();
   Overlay();
-  switching();
   print(getCurrentX(), getCurrentY());
 
 }
-let isSquare;
+let isSquare = 0;
 
 
-function switching(){
-  if(key === ' '){
-    isSquare = 0;
-  }
-  else if (isSquare === 0 && key === ' '){
-    isSquare = 2;
-    if(key === ' '){
-      isSquare = 1;
-    }
-    
-  }
-  else{
-    isSquare = 1;
-  }
 
-}
+
 function Overlay(){
   let x = getCurrentX();
   let y = getCurrentY();
   fill(255,0,0,100);
-  if(keyIsDown(SHIFT)){
+  if(keyIsDown(SHIFT) && isSquare === 1){
     fill(255,0,0,100);
     square(x*squareSize,y*squareSize,squareSize);
   }
+  else if(keyIsDown(SHIFT) && isSquare === 0){
+    fill(255,0,0,100);
+    square(x*squareSize,y*squareSize,squareSize);
+  }
+
 
   else if(isSquare === 0){
   square(x*squareSize,y*squareSize,squareSize);
   if(x+1 < cols)square((x+1)*squareSize, y*squareSize, squareSize);
   if(y+1 < rows)square(x*squareSize,(y+1)*squareSize,squareSize);
   if(y+1 < rows && x + 1 < cols)square((x+1)*squareSize,(y+1)*squareSize,squareSize);
-  isSquare = 1;
   }
   else if(isSquare === 1){
     fill(255,0,0,100);
@@ -100,18 +90,19 @@ function Overlay(){
     if(x>= 0)square((x-1)*squareSize,y*squareSize,squareSize);
     if(y+1 < rows)square(x*squareSize,(y+1)*squareSize,squareSize);
     if(y-1 >= 0)square(x*squareSize,(y-1)*squareSize,squareSize)
-    isSquare = 0;
     
   }
-  else if(isSquare === 2){
-    fill(255,0,0,100);
-    square(x*squareSize ,y*squareSize,squareSize);
-    if(x+1 < cols)square((x+1)*squareSize, y*squareSize, squareSize);
-    if(x>= 0)square((x-1)*squareSize,y*squareSize,squareSize);
-    if(y+1 < rows)square(x*squareSize,(y+1)*squareSize,squareSize);
-    if(y-1 >= 0)square(x*squareSize,(y-1)*squareSize,squareSize)
-  }
 
+
+}
+
+function keyPressed(){
+  if(isSquare === 0 && keyCode === 32){
+    isSquare = 1;
+  }
+  else if(isSquare === 1 && keyCode === 32){
+    isSquare = 0;
+  }
 }
 function renderGrid(){
   // interpret the information in the 2D array
@@ -135,13 +126,14 @@ function mousePressed(){
 
   //ALWAYS: flip the "focused title"
   if(keyIsDown(SHIFT) && isSquare === 0 ){
-    fill(255,0,0,100);
-    square(x*squareSize,y*squareSize, squareSize);
     flip(x,y);
 
   }
+  else if(keyIsDown(SHIFT) && isSquare === 1){
+    flip(x,y);
+  }
 
-  else if(isSquare === 0 && key === ' '){
+  else if(isSquare === 0){
     if(x < cols)flip(x,y);
     if(x+1)flip(x+1,y);
     if(y+1)flip(x,y+1);
@@ -160,3 +152,5 @@ function mousePressed(){
   
 
 }
+
+
