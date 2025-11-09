@@ -4,9 +4,11 @@
 
 // 0 (Black) 255 (white)
 
+let isSquare = 1; // starts as a cross
 
-let pattern;
-pattern = [0,255];
+let win = 0; // black
+
+let pattern = [0,255];
 
 let grid = [[],[]];
 
@@ -14,7 +16,6 @@ let rows;
 let cols; 
 
 let squareSize = 60;
-let maxSq;
 
 
 function getCurrentX(){
@@ -38,7 +39,7 @@ function flip(x,y){
   else grid[y][x] = 0;
 }
 function setup() {
-  createCanvas(windowWidth, windowHeight)
+  createCanvas(windowWidth, windowHeight);
   grid = [
     [random(pattern), random(pattern), random(pattern), random(pattern),random(pattern)],
     [random(pattern), random(pattern), random(pattern), random(pattern),random(pattern)],
@@ -55,28 +56,25 @@ function draw() {
   background(200);
   renderGrid();
   Overlay();
-  print(getCurrentX(), getCurrentY());
+  
+  
+  // For winning
+  winState();
 
 }
-let isSquare = 0;
-
-
-
 
 function Overlay(){
   let x = getCurrentX();
   let y = getCurrentY();
   fill(255,0,0,100);
-  if(keyIsDown(SHIFT) && isSquare === 1){
+  if(isSquare === 0 && keyIsDown(SHIFT)){
     fill(255,0,0,100);
     square(x*squareSize,y*squareSize,squareSize);
   }
-  else if(keyIsDown(SHIFT) && isSquare === 0){
+  else if(isSquare === 1 && keyIsDown(SHIFT)){
     fill(255,0,0,100);
     square(x*squareSize,y*squareSize,squareSize);
   }
-
-
   else if(isSquare === 0){
   square(x*squareSize,y*squareSize,squareSize);
   if(x+1 < cols)square((x+1)*squareSize, y*squareSize, squareSize);
@@ -89,18 +87,16 @@ function Overlay(){
     if(x+1 < cols)square((x+1)*squareSize, y*squareSize, squareSize);
     if(x>= 0)square((x-1)*squareSize,y*squareSize,squareSize);
     if(y+1 < rows)square(x*squareSize,(y+1)*squareSize,squareSize);
-    if(y-1 >= 0)square(x*squareSize,(y-1)*squareSize,squareSize)
-    
+    if(y-1 >= 0)square(x*squareSize,(y-1)*squareSize,squareSize);
+  
+
   }
-
-
 }
-
 function keyPressed(){
-  if(isSquare === 0 && keyCode === 32){
+  if(isSquare === 0 && key === ' '){
     isSquare = 1;
   }
-  else if(isSquare === 1 && keyCode === 32){
+  else if(isSquare === 1 && key === ' '){
     isSquare = 0;
   }
 }
@@ -125,21 +121,20 @@ function mousePressed(){
   let y = getCurrentY();
 
   //ALWAYS: flip the "focused title"
-  if(keyIsDown(SHIFT) && isSquare === 0 ){
-    flip(x,y);
-
-  }
-  else if(keyIsDown(SHIFT) && isSquare === 1){
+  if(isSquare === 0 && keyIsDown(SHIFT)){
     flip(x,y);
   }
+  else if(isSquare === 1 && keyIsDown(SHIFT)){
+    flip(x,y);
+  }
 
-  else if(isSquare === 0){
+  else if(isSquare === 0 ){
     if(x < cols)flip(x,y);
     if(x+1)flip(x+1,y);
     if(y+1)flip(x,y+1);
     if(x+1 && y + 1)flip(x+1,y+1);
   }
-  else{
+  else if(isSquare === 1){
     if(x < cols)flip(x,y);
     if(x+1 < cols)flip(x+1,y)
     if(x-1 >= 0)flip(x-1,y);
@@ -147,10 +142,30 @@ function mousePressed(){
     if(y -1 >= 0)flip(x,y-1);
   }
 
-  //IF THEY EXIST:
-  //fli our NSEW neighbours (cross pattern)
-  
-
 }
 
 
+function winState(){
+  
+  win = 1 // white
+  
+  for(let y = 0; y < rows; y++){
+    for(let x = 0; x < cols; x++){
+      if(grid[y][x] !== 255){ // checks if the squares are black
+        win = 0; // does nothing
+        break;
+
+
+      }
+    }
+  }
+  if(win === 1){ // if white 
+    background("black");
+    textSize(32);
+    textAlign(CENTER,CENTER);
+    fill("green");
+    text("YOU WIN", width/2, height/2);
+    noLoop(); // stops everything
+  }
+
+}
