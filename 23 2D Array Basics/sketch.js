@@ -8,7 +8,7 @@ let isSquare = 1; // starts as a cross
 
 let win = 0; // black
 
-let pattern = [0,255];
+let pattern;
 
 let grid = [[],[]];
 
@@ -32,14 +32,9 @@ function getCurrentY(){
 
 }
 
-
-function flip(x,y){
-  //takes a tile @ x,y and inverts its value
-  if(grid[y][x] === 0) grid[y][x] = 255;
-  else grid[y][x] = 0;
-}
-function setup() {
-  createCanvas(windowWidth, windowHeight);
+function randomGrid(){
+    
+  pattern = [0,255];
   grid = [
     [random(pattern), random(pattern), random(pattern), random(pattern),random(pattern)],
     [random(pattern), random(pattern), random(pattern), random(pattern),random(pattern)],
@@ -50,6 +45,17 @@ function setup() {
   ];
   rows = grid.length;
   cols = grid[0].length;
+
+}
+
+function flip(x,y){
+  //takes a tile @ x,y and inverts its value
+  if(grid[y][x] === 0) grid[y][x] = 255;
+  else grid[y][x] = 0;
+}
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  randomGrid();
 }
 
 function draw() {
@@ -58,10 +64,11 @@ function draw() {
   Overlay();
   
   
-  // For winning
+  // if all the sq turn white
   winState();
 
 }
+// Overlay 
 
 function Overlay(){
   let x = getCurrentX();
@@ -92,8 +99,9 @@ function Overlay(){
 
   }
 }
+// toggling between square and cross
 function keyPressed(){
-  if(isSquare === 0 && key === ' '){
+  if(isSquare === 0 && key === ' '){ // when space is pressed
     isSquare = 1;
   }
   else if(isSquare === 1 && key === ' '){
@@ -112,6 +120,7 @@ function renderGrid(){
   }
 }
 }
+
 
 function mousePressed(){
   // flip current title
@@ -145,6 +154,7 @@ function mousePressed(){
 }
 
 
+// Winning state
 function winState(){
   
   win = 1 // white
@@ -153,9 +163,7 @@ function winState(){
     for(let x = 0; x < cols; x++){
       if(grid[y][x] !== 255){ // checks if the squares are black
         win = 0; // does nothing
-        break;
-
-
+        return;
       }
     }
   }
