@@ -8,9 +8,9 @@ let isSquare = 1; // starts as a cross
 
 let win = 0; // black
 
-let pattern;
+// let pattern;
 
-let grid = [[],[]];
+let grid = [];
 
 let rows;
 let cols; 
@@ -34,15 +34,15 @@ function getCurrentY(){
 
 function randomGrid(){
     
-  pattern = [0,255];
-  grid = [
-    [random(pattern), random(pattern), random(pattern), random(pattern),random(pattern)],
-    [random(pattern), random(pattern), random(pattern), random(pattern),random(pattern)],
-    [random(pattern), random(pattern), random(pattern), random(pattern),random(pattern)],
-    [random(pattern), random(pattern), random(pattern), random(pattern),random(pattern)],
-    [random(pattern), random(pattern), random(pattern), random(pattern),random(pattern)]
-  
-  ];
+  // pattern = [0,255];
+  grid = [x][y];
+  for(y = 0; y < rows; y++) {
+    for(x = 0; x < cols; x++){
+      grid[y][x] = random[0,255]
+    }
+    
+
+  }
   rows = grid.length;
   cols = grid[0].length;
 
