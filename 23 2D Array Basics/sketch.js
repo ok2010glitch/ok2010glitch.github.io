@@ -4,16 +4,28 @@
 
 // 0 (Black) 255 (white)
 
+
+
+// Global Variables
 let isSquare = 1; // starts as a cross
+
 
 let win = 0; // black
 
 // let pattern;
 
-let grid = [];
+let grid = [
+  [0,0,0,255,255],
+  [0,255,0,255,255],
+  [0,0,0,255,0],
+  [0,255,0,255,255],
+  [255,0,0,0,255],
 
-let rows;
-let cols; 
+];
+
+
+let rows = grid.length;
+let cols = grid[0].length;
 
 let squareSize = 60;
 
@@ -32,19 +44,14 @@ function getCurrentY(){
 
 }
 
-function randomGrid(){
-    
-  // pattern = [0,255];
-  grid = [x][y];
+function randomGrid(){ // generates the random colors for the puzzle
   for(y = 0; y < rows; y++) {
     for(x = 0; x < cols; x++){
-      grid[y][x] = random[0,255]
+      grid[y][x] = random([0,255])
     }
     
 
   }
-  rows = grid.length;
-  cols = grid[0].length;
 
 }
 
@@ -56,16 +63,17 @@ function flip(x,y){
 function setup() {
   createCanvas(windowWidth, windowHeight);
   randomGrid();
+  
 }
 
 function draw() {
   background(200);
   renderGrid();
   Overlay();
-  
-  
-  // if all the sq turn white
-  winState();
+
+
+
+    winState();
 
 }
 // Overlay 
@@ -123,6 +131,7 @@ function renderGrid(){
 
 
 function mousePressed(){
+  
   // flip current title
   // upgrade: only do this if the mouse is on the canvas
 
@@ -153,27 +162,40 @@ function mousePressed(){
 
 }
 
-
 // Winning state
 function winState(){
   
-  win = 1 // white
+  let allWhite = true; // white
+  let allBlack = true; // black
+  let condition = 0;
   
   for(let y = 0; y < rows; y++){
     for(let x = 0; x < cols; x++){
       if(grid[y][x] !== 255){ // checks if the squares are black
-        win = 0; // does nothing
-        return;
+        allWhite = false; // does nothing
+        condition = 1
       }
+      if(grid[y][x] !== 0){ // checks if the squares are black
+        allBlack = false; // does nothing
+        condition = 1
     }
   }
-  if(win === 1){ // if white 
+}
+  if(allWhite === true || allBlack === true){ // if white or black (all of them)
+    if(allWhite === true){
     background("black");
-    textSize(32);
-    textAlign(CENTER,CENTER);
+
+    }
+    else if(allBlack === true){
+    background("black");
+    }
     fill("green");
-    text("YOU WIN", width/2, height/2);
-    noLoop(); // stops everything
+    textSize(32);
+    textAlign(CENTER, CENTER);
+    text("YOU WIN", width / 2, height / 2);
+    noLoop();
   }
+ 
+
 
 }
