@@ -83,12 +83,14 @@ function Overlay(){
     fill(255,0,0,100);
     square(x*squareSize,y*squareSize,squareSize);
   }
+  // Square
   else if(isSquare === 0){
   square(x*squareSize,y*squareSize,squareSize);
   if(x+1 < cols)square((x+1)*squareSize, y*squareSize, squareSize);
   if(y+1 < rows)square(x*squareSize,(y+1)*squareSize,squareSize);
   if(y+1 < rows && x + 1 < cols)square((x+1)*squareSize,(y+1)*squareSize,squareSize);
   }
+  // Cross
   else if(isSquare === 1){
     fill(255,0,0,100);
     square(x*squareSize ,y*squareSize,squareSize);
@@ -166,7 +168,7 @@ function winState(){
       if(grid[y][x] !== 255){ // checks if the squares are black
         allWhite = false; // does nothing
       }
-      if(grid[y][x] !== 0){
+      if(grid[y][x] !== 0){ // check if square are white
         allBlack = false;
       }
     }
