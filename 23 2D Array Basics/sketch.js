@@ -1,16 +1,17 @@
-// 2D Array Basics
+// Puzzel Game
 // Syed Saad Hussain
 // November 3, 2025
+
+
 
 // 0 (Black) 255 (white)
 
 let isSquare = 1; // starts as a cross
 
-let win = 0; // black
+// 1 -> cross
+// 0 -> square
 
-// let pattern;
-
-let grid = [
+let grid = [ // this grid holds the square's position and color
   [0,255,0,0,255],
   [0,255,0,0,255],
   [0,255,0,0,255],
@@ -18,14 +19,11 @@ let grid = [
   [0,255,0,0,255],
 ]
 
-let rows;
-let cols; 
-
-rows = grid.length;
-cols = grid[0].length;
+// 5x5 grid
+let rows = grid.length;
+let cols = grid[0].length;
 
 let squareSize = 60;
-
 
 function getCurrentX(){
   //determine current col of mouse postition
@@ -41,7 +39,7 @@ function getCurrentY(){
 
 }
 
-function randomGrid(){
+function randomGrid(){ // generates the grid randomly every start of the game
   for(y = 0; y < rows; y++) {
     for(x = 0; x < cols; x++){
       grid[y][x] = random([0,255])
@@ -57,6 +55,7 @@ function flip(x,y){
   if(grid[y][x] === 0) grid[y][x] = 255;
   else grid[y][x] = 0;
 }
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
   randomGrid();
@@ -65,43 +64,42 @@ function setup() {
 function draw() {
   background(200);
   renderGrid();
+  
+  //for navigation
   Overlay();
+
+  // When all squares
+  //turns white or black
   winState();
-
 }
-// Overlay 
 
+
+// Overlay 
 function Overlay(){
   let x = getCurrentX();
   let y = getCurrentY();
-  fill(255,0,0,100);
-  if(isSquare === 0 && keyIsDown(SHIFT)){
-    fill(255,0,0,100);
-    square(x*squareSize,y*squareSize,squareSize);
-  }
-  else if(isSquare === 1 && keyIsDown(SHIFT)){
-    fill(255,0,0,100);
+  fill(14,155,134,100);
+  // Only one square
+  if((isSquare === 0 || isSquare === 1) && keyIsDown(SHIFT)){
     square(x*squareSize,y*squareSize,squareSize);
   }
   // Square
   else if(isSquare === 0){
-  square(x*squareSize,y*squareSize,squareSize);
-  if(x+1 < cols)square((x+1)*squareSize, y*squareSize, squareSize);
-  if(y+1 < rows)square(x*squareSize,(y+1)*squareSize,squareSize);
-  if(y+1 < rows && x + 1 < cols)square((x+1)*squareSize,(y+1)*squareSize,squareSize);
+    square(x*squareSize,y*squareSize,squareSize);
+    if(x+1 < cols)square((x+1)*squareSize, y*squareSize, squareSize);
+    if(y+1 < rows)square(x*squareSize,(y+1)*squareSize,squareSize);
+    if(y+1 < rows && x + 1 < cols)square((x+1)*squareSize,(y+1)*squareSize,squareSize);
   }
   // Cross
   else if(isSquare === 1){
-    fill(255,0,0,100);
     square(x*squareSize ,y*squareSize,squareSize);
     if(x+1 < cols)square((x+1)*squareSize, y*squareSize, squareSize);
     if(x>= 0)square((x-1)*squareSize,y*squareSize,squareSize);
     if(y+1 < rows)square(x*squareSize,(y+1)*squareSize,squareSize);
     if(y-1 >= 0)square(x*squareSize,(y-1)*squareSize,squareSize);
-  
-
-  }
+   }
 }
+
 // toggling between square and cross
 function keyPressed(){
   if(isSquare === 0 && key === ' '){ // when space is pressed
@@ -111,6 +109,7 @@ function keyPressed(){
     isSquare = 0;
   }
 }
+
 function renderGrid(){
   // interpret the information in the 2D array
   // a grid of square on the screen to reflect it.
@@ -133,19 +132,17 @@ function mousePressed(){
   let y = getCurrentY();
 
   //ALWAYS: flip the "focused title"
-  if(isSquare === 0 && keyIsDown(SHIFT)){
+  if((isSquare === 0 || isSquare === 1) && keyIsDown(SHIFT)){
     flip(x,y);
   }
-  else if(isSquare === 1 && keyIsDown(SHIFT)){
-    flip(x,y);
-  }
-
-  else if(isSquare === 0 ){
+  //Square
+  else if(isSquare === 0){
     if(x < cols)flip(x,y);
     if(x+1)flip(x+1,y);
     if(y+1)flip(x,y+1);
     if(x+1 && y + 1)flip(x+1,y+1);
   }
+  //Cross
   else if(isSquare === 1){
     if(x < cols)flip(x,y);
     if(x+1 < cols)flip(x+1,y)
@@ -160,25 +157,28 @@ function mousePressed(){
 // Winning state
 function winState(){
   
-  allWhite = true;
-  allBlack = true;
+  allWhite = true; // all squares are white
+  allBlack = true; // all squares are black
   
+  // Checks whether all are white or black
   for(let y = 0; y < rows; y++){
     for(let x = 0; x < cols; x++){
-      if(grid[y][x] !== 255){ // checks if the squares are black
-        allWhite = false; // does nothing
+      if(grid[y][x] !== 255){ // checks if the squares are not white
+        // if not, turn false -> do nothing
+        allWhite = false; 
       }
-      if(grid[y][x] !== 0){ // check if square are white
+      if(grid[y][x] !== 0){ // check if square are not black
+        // if not, turn false -> do nothing
         allBlack = false;
       }
     }
   }
   if(allWhite === true || allBlack === true){
-    background("black") // if white 
-    fill("green")
+    background(0);
+    fill("green");
     textSize(78);
     textAlign(CENTER,CENTER);
-    text("YOU WIN", width/2, height/2);
+    text("YOU WIN!", width/2, height/2);
     return;
   }
 
