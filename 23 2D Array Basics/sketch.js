@@ -1,10 +1,10 @@
-// Puzzel Game
+// Puzzel Game using 2D Arrays
 // Syed Saad Hussain
 // November 3, 2025
 
 
 
-// 0 (Black) 255 (white)
+// 0 (Black) and 255 (white)
 
 let isSquare = 1; // starts as a cross
 
@@ -72,7 +72,6 @@ function draw() {
   //turns white or black
   winState();
 }
-
 
 // Overlay 
 function Overlay(){
@@ -179,7 +178,6 @@ function winState(){
     textSize(78);
     textAlign(CENTER,CENTER);
     text("YOU WIN!", width/2, height/2);
-    return;
   }
 
 }
