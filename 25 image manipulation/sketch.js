@@ -54,7 +54,7 @@ function draw() {
   // grayScale();
   background(0)
   textImage();
-  // updatePixels();
+  updatePixels();
 }
 
 
