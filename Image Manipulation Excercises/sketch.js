@@ -79,6 +79,22 @@ function imgThree(){
 
   }
 }
+
+function ImgFour(){
+  for(let y = 0; y < pixels.length; y += 4){
+    for(let x = 0; x < pixels[y].length; x += 4){
+      let i = (y* width + x) * 4;
+      let mirrorX = width -1-x;
+      let mirrorPixelIndex = (y*width+mirrorX) * 4;
+
+      pixels[mirrorPixelIndex] = pixels[i];
+      pixels[mirrorPixelIndex] = pixels[i+1];
+      pixels[mirrorPixelIndex] = pixels[i+2];
+      
+    }
+  }
+
+}
 async function setup() {
 
   pixelDensity(1);
@@ -94,6 +110,7 @@ function draw() {
   // gcolor();
   // majorityColor();
   imgThree();
+  ImgFour();
   
   updatePixels();
 
