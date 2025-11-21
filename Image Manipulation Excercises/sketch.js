@@ -81,15 +81,16 @@ function imgThree(){
 }
 
 function ImgFour(){
-  for(let y = 0; y < pixels.length; y += 4){
-    for(let x = 0; x < pixels[y].length; x += 4){
+  for(let y = 0; y < height; y ++){
+    for(let x = width/2; x < width; x ++){
       let i = (y* width + x) * 4;
       let mirrorX = width -1-x;
       let mirrorPixelIndex = (y*width+mirrorX) * 4;
 
       pixels[mirrorPixelIndex] = pixels[i];
-      pixels[mirrorPixelIndex] = pixels[i+1];
-      pixels[mirrorPixelIndex] = pixels[i+2];
+      pixels[mirrorPixelIndex +1] = pixels[i+1];
+      pixels[mirrorPixelIndex+2] = pixels[i+2];
+      pixels[mirrorPixelIndex+3] = pixels[i+3];
       
     }
   }
@@ -98,7 +99,7 @@ function ImgFour(){
 async function setup() {
 
   pixelDensity(1);
-  myImage = await loadImage("assets/nuit.jpg");
+  myImage = await loadImage("assets/hand.jpg");
   createCanvas(600, 600);
 
 }
@@ -109,7 +110,7 @@ function draw() {
   loadPixels(); // populate the pixels array
   // gcolor();
   // majorityColor();
-  imgThree();
+  // imgThree();
   ImgFour();
   
   updatePixels();
