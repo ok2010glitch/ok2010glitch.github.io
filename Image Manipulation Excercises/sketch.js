@@ -12,8 +12,6 @@ function gcolor(){
   if(pixelIndex > width/2){
     pixels[i+1] = 0;
   }
-
-
 }
 }
 
@@ -99,7 +97,7 @@ function ImgFour(){
 async function setup() {
 
   pixelDensity(1);
-  myImage = await loadImage("assets/hand.jpg");
+  myImage = await loadImage("assets/nuit.jpg");
   createCanvas(600, 600);
 
 }
@@ -110,8 +108,8 @@ function draw() {
   loadPixels(); // populate the pixels array
   // gcolor();
   // majorityColor();
-  // imgThree();
-  ImgFour();
+  imgThree();
+  // ImgFour();
   
   updatePixels();
 
