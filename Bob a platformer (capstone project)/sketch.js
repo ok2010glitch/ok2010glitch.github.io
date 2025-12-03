@@ -9,21 +9,18 @@
 let levels;
 
 let player;
-let c = [];
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  player = new Bob(25,25);
-  push();
+  player = new Bob(700,25);
 }
 
 function draw() {
   background(220);
-  for(let player of c ){
-    player.movement();
-    player.body();
+  player.body();
+  player.gravity();
+
   }
-}
 
 class Bob{
   constructor(x,y){
@@ -31,20 +28,44 @@ class Bob{
     this.y = y;
     this.vy = 0; // velocity y
     this.g = 0.5; // gravity
-    this.speed = 4;
+    this.sx = 4; //speed for player
     this.jumpP = -5; // jump power
   }
   body(){
-    fill("blue");
-    square(this.x,this.y,40,20);
+    noStroke();
+    fill(0, 150, 255);
+    square(this.x,this.y,60,5);
+    fill("white")
+    square(this.x+10,this.y+10,15,5);
+    square(this.x+35,this.y+10,15,5);
+    fill("black");
+    square(this.x+15,this.y+15,5,2);
+    square(this.x+40,this.y+15,5,2);
   }
   movement(){
     if(keyIsPressed(RIGHT_ARROW)){
-      this.x += this.speed;
+      this.x += this.sx;
     }
     if(keyIsPressed(LEFT_ARROW)){
-      this.x -= this.speed;
+      this.x -= this.sx;
     }
   }
+  gravity(){
+    this.y += this.vy;
+    this.vy += this.g;
 
+  }
+  collisionPlats(){
+
+  }
+
+}
+
+class platformer{
+  constructor(x,y,width,height){
+    this.x = x;
+    this.y = y;
+    this.w = width;
+    this.h = height;
+  }
 }
