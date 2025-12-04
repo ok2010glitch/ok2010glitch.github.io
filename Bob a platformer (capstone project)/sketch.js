@@ -9,12 +9,14 @@
 let levels;
 let plat = []
 let player;
+let canvasW = 1200;
+let canvasH = 900;
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+  createCanvas(canvasW,canvasH);
   player = new Bob(650,25);
-  plat.push(new platform(0,570,width,400));
-  plat.push(new platform(30,450,300,50));
+  plat.push(new platform(0,590,canvasW,200));
+  plat.push(new platform(30,470,300,50));
   plat.push(new platform(520,400,150,50));
 
   
@@ -29,6 +31,7 @@ function draw() {
   }
   player.collisionPlatsA();
   player.movement();
+  player.wallJump();
 
   }
 
@@ -42,6 +45,7 @@ class Bob{
     this.sx = 4; //speed for player
     this.jumpP = -10; // jump power
     this.onGround = false;
+    this.onWall = false;
   }
   body(){
     noStroke();
@@ -67,6 +71,10 @@ class Bob{
     }
     if(this.x > width){
       this.x = 0;
+    }
+    if(this.onWall){
+      this.g = 0;
+      this.vy = 0.2;
     }
 }
   gravity(){
@@ -102,6 +110,18 @@ class Bob{
 
   }
 
+}
+wallJump(){
+  for(let w of plat){
+    if(
+      this.y + this.size > w.yp &&
+      this.y +this.size < w.yp + w.h &&
+      this.vy >= 0;
+    ){
+      this.y = this.yp + w.h;
+      this.onWall = true;
+    }
+  }
 }
 
 }
