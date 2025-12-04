@@ -8,7 +8,7 @@ let myImage;
 function split(){
   // use the single loop stategy
  for(let i = 0; i < pixels.length; i += 4){
-  let pixelIndex = (i / 4) % width;
+  let pixelIndex = (i / 4) % 600;
   if(pixelIndex > 300){
     pixels[i] = 255;
     pixels[i+1] = 0;
