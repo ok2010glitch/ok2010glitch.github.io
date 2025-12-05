@@ -9,16 +9,16 @@
 let levels;
 let plat = []
 let player;
-let canvasW = 1510;
-let canvasH = 690;
+let canvasW = 1200;
+let canvasH = 900;
 
 function setup() {
   createCanvas(canvasW,canvasH);
   player = new Bob(650,25);
   plat.push(new platform(0,590,canvasW,200));
-  plat.push(new platform(100,470,300,50));
+  plat.push(new platform(30,470,300,50));
   plat.push(new platform(520,400,150,50));
-  plat.push(new platform(1000,50,200,500))
+  plat.push(new platform(1000,50,15,600));
 
   
 }
@@ -48,6 +48,7 @@ class Bob{
     this.onGround = false;
     this.onWall = false;
     this.wallSide = 0;
+    this.wallJ = false;
   }
   body(){
     noStroke();
@@ -62,15 +63,21 @@ class Bob{
   }
   movement(){
     if(keyIsDown(RIGHT_ARROW)){
-      this.x += this.sx;
+      this.sx=4;
     }
     if(keyIsDown(LEFT_ARROW)){
-      this.x -= this.sx;
+      this.sx=-4;
     }
     if(keyIsDown(UP_ARROW) && this.onGround){
       this.vy = this.jumpP;
       this.onGround = false;
     }
+    if(this.x > width){
+      this.x = 0;
+    }
+    this.sx *= 0.9;
+    this.x += this.sx;
+
 }
   gravity(){
     this.y += this.vy;
@@ -123,20 +130,30 @@ wallJump(){
     }
     if(this.onWall && keyIsDown(UP_ARROW) &&
      this.wallSide === 1){
-      this.vy -= 4;
-      this.x += 10;
+      if(this.wallJ){
+        this.vy -= 4;
+      }
       this.onWall = false;
+      this.wallJ = false;
     }
     if(this.onWall && keyIsDown(UP_ARROW) &&
      this.wallSide === 2){
-      this.vy -= 4;
-      this.x -= 10;
+      if(this.wallJ){
+        this.vy -= 4;
+      }
       this.onWall = false;
+      this.wallJ = false;
+    }
+    if(this.onWall){
+      this.wallJ = true;
     }
   }
 }
+    
+  
 
 }
+
 
 class platform{
   constructor(x,y,w,h){
