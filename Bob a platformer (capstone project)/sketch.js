@@ -7,7 +7,7 @@
 
 // Global Variables
 let level = 1;
-let plat = []
+let plat = [];
 let player;
 let canvasW = 1300;
 let canvasH = 670;
@@ -17,14 +17,14 @@ function setup() {
   plat.push(new platform(0,590,canvasW,200));
   player = new Bob(20 ,25);  
   
-  if(level === 1){
+if(level === 1){
   plat.push(new platform(30,470,300,50));
   plat.push(new platform(520,400,150,50));
   plat.push(new platform(750,300,100,40));
   plat.push(new platform(1000,200,70,80));
   plat.push(new platform(-10,0,10,canvasH));
  }
-else if(level === 2){
+if(level === 2){
   plat.push(new platform(50,560,200,50));
   plat.push(new platform(320,500,150,50));
   plat.push(new platform(750,300,100,40));
@@ -39,15 +39,20 @@ function draw() {
   background("black");
   player.body();
   player.gravity();
-  for(let p of plat){
-    p.create();
-  }
+    for(let p of plat){
+      p.create();
+    }
+
+
+  
   player.collisionPlatsA();
   player.movement();
   player.wallCollision();
   player.levelChanging();
   }
+function changingLevels(){
 
+}
 class Bob{
   constructor(x,y){
     this.x = x;
@@ -62,6 +67,8 @@ class Bob{
     this.onWall = false;
     this.wallSide = 0;
     this.pushBack = 10;
+    this.jumpA = 2; // jumps avalaible
+    this.wallJumpRemaining = this.jumpA;
   }
   body(){
     noStroke();   
@@ -75,31 +82,39 @@ class Bob{
     square(this.x+40,this.y+15,5,2);
   }
   movement(){
+    // Going right
     if(keyIsDown(RIGHT_ARROW)){
       this.vx=this.speed;
     }
+    // Going left
     if(keyIsDown(LEFT_ARROW)){
       this.vx=-this.speed;
     }
     if(keyIsDown(UP_ARROW)){
-    if(this.onWall && !this.onGround &&
-     this.wallSide === 1){
+    //Right wall
+    if(this.onWall && !this.onGround && this.wallJumpRemaining > 0){
+      if(this.wallSide === 1){
       this.vy = this.jumpP;
       this.vx = this.pushBack;
       this.onWall = false;
       this.onGround = false;
+      this.wallJumpRemaining --;
     }
-    else if(this.onWall && !this.onGround &&
-     this.wallSide === 2){
+    //left wall
+    if(this.wallSide === 2){
       this.vy = this.jumpP;
       this.vx = -this.pushBack;
       this.onWall = false;
       this.onGround = false;
-     }
+      this.wallJumpRemaining --;
+    }
+    }
+    // if Bob is on the ground
     else if(this.onGround){
       this.vy = this.jumpP;
       this.onGround = false;
       this.onWall = false;
+      this.wallJumpRemaining = 2;
     }
     }
     this.vx *= 0.9;
