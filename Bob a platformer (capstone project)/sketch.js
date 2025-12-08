@@ -6,25 +6,37 @@
 // - describe what you did to take this project "above and beyond"
 
 // Global Variables
-let levels;
+let level = 1;
 let plat = []
 let player;
-let canvasW = 1200;
-let canvasH = 900;
+let canvasW = 1300;
+let canvasH = 670;
 
 function setup() {
   createCanvas(canvasW,canvasH);
-  player = new Bob(650,25);
   plat.push(new platform(0,590,canvasW,200));
+  player = new Bob(20 ,25);  
+  
+  if(level === 1){
   plat.push(new platform(30,470,300,50));
   plat.push(new platform(520,400,150,50));
-  plat.push(new platform(1000,50,15,600));
+  plat.push(new platform(750,300,100,40));
+  plat.push(new platform(1000,200,70,80));
+  plat.push(new platform(-10,0,10,canvasH));
+ }
+else if(level === 2){
+  plat.push(new platform(50,560,200,50));
+  plat.push(new platform(320,500,150,50));
+  plat.push(new platform(750,300,100,40));
+  plat.push(new platform(1100,200,70,100));
+
+  }
 
   
 }
 
 function draw() {
-  background(220);
+  background("black");
   player.body();
   player.gravity();
   for(let p of plat){
@@ -32,8 +44,8 @@ function draw() {
   }
   player.collisionPlatsA();
   player.movement();
-  player.wallJump();
-
+  player.wallCollision();
+  player.levelChanging();
   }
 
 class Bob{
@@ -43,40 +55,55 @@ class Bob{
     this.size = 60;
     this.vy = 0; // velocity y
     this.g = 0.5; // gravity
-    this.sx = 4; //speed for player
+    this.vx = 0;
+    this.speed = 5; //speed for player
     this.jumpP = -10; // jump power
     this.onGround = false;
     this.onWall = false;
     this.wallSide = 0;
-    this.wallJ = false;
+    this.pushBack = 10;
   }
   body(){
-    noStroke();
-    fill(0, 150, 255);
+    noStroke();   
+    fill("white");
     square(this.x,this.y,this.size,5);
-    fill("white")
+    fill("black")
     square(this.x+10,this.y+10,15,5);
     square(this.x+35,this.y+10,15,5);
-    fill("black");
+    fill("white");
     square(this.x+15,this.y+15,5,2);
     square(this.x+40,this.y+15,5,2);
   }
   movement(){
     if(keyIsDown(RIGHT_ARROW)){
-      this.sx=4;
+      this.vx=this.speed;
     }
     if(keyIsDown(LEFT_ARROW)){
-      this.sx=-4;
+      this.vx=-this.speed;
     }
-    if(keyIsDown(UP_ARROW) && this.onGround){
+    if(keyIsDown(UP_ARROW)){
+    if(this.onWall && !this.onGround &&
+     this.wallSide === 1){
       this.vy = this.jumpP;
+      this.vx = this.pushBack;
+      this.onWall = false;
       this.onGround = false;
     }
-    if(this.x > width){
-      this.x = 0;
+    else if(this.onWall && !this.onGround &&
+     this.wallSide === 2){
+      this.vy = this.jumpP;
+      this.vx = -this.pushBack;
+      this.onWall = false;
+      this.onGround = false;
+     }
+    else if(this.onGround){
+      this.vy = this.jumpP;
+      this.onGround = false;
+      this.onWall = false;
     }
-    this.sx *= 0.9;
-    this.x += this.sx;
+    }
+    this.vx *= 0.9;
+    this.x += this.vx;
 
 }
   gravity(){
@@ -93,7 +120,7 @@ class Bob{
       ){
         if(
           this.y + this.size > p.yp &&
-          this.y + this.size < p.yp + 20 &&
+          this.y + this.size < p.yp + p.h &&
           this.vy >= 0
         ){
           this.y = p.yp - this.size;
@@ -113,47 +140,38 @@ class Bob{
   }
 
 }
-wallJump(){
+wallCollision(){
+  this.onWall = false;
   for(let w of plat){
     let vr = this.y + this.size > w.yp && this.y < w.yp+w.h;
     // right side
     if(vr && this.x < w.xp + w.w && this.x > w.xp + w.w - 5){
       this.x = w.xp + w.w;
+      this.vx = 0;
       this.onWall = true;
       this.wallSide = 1; // right side
     }
     // left side
-    if(vr && this.x + this.size > w.xp && this.x < w.xp -10){
+    if(vr && this.x + this.size > w.xp && this.x < w.xp ){
       this.x = w.xp - this.size;
+      this.vx = 0;
       this.onWall = true;
       this.wallSide = 2; // left
     }
-    if(this.onWall && keyIsDown(UP_ARROW) &&
-     this.wallSide === 1){
-      if(this.wallJ){
-        this.vy -= 4;
-      }
-      this.onWall = false;
-      this.wallJ = false;
-    }
-    if(this.onWall && keyIsDown(UP_ARROW) &&
-     this.wallSide === 2){
-      if(this.wallJ){
-        this.vy -= 4;
-      }
-      this.onWall = false;
-      this.wallJ = false;
-    }
-    if(this.onWall){
-      this.wallJ = true;
-    }
+    
   }
+}
+
+levelChanging(){
+  if(this.x > canvasW){
+    level += 1;
+  }
+
 }
     
   
 
 }
-
 
 class platform{
   constructor(x,y,w,h){
@@ -163,7 +181,7 @@ class platform{
     this.h = h;
   }
   create(){
-    fill("black")
+    fill(28, 27, 27);
     rect(this.xp,this.yp,this.w,this.h);
 
   }
