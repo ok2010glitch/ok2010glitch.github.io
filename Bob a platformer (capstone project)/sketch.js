@@ -16,10 +16,6 @@ function setup() {
   createCanvas(canvasW,canvasH);
   changingLevels();
   player = new Bob(20 ,25);  
-  
-
-
-  
 }
 
 function draw() {
@@ -71,9 +67,12 @@ class Bob{
     this.onGround = false;
     this.onWall = false;
     this.wallSide = 0;
-    this.pushBack = 20;
+    this.pushBack = 5;
     this.jumpA = 2; // jumps avalaible
-    this.wallJumpRemaining = this.jumpA;
+    this.airTime = 0;
+    this.airMax = 20;
+    this.decRate = 0.9; //deceleration rate 
+    // this.wallJumpRemaining = this.jumpA;
   }
   body(){
     noStroke();   
@@ -88,22 +87,29 @@ class Bob{
   }
   movement(){
     // Going right
-    if(keyIsDown(RIGHT_ARROW)){
-      this.vx=this.speed;
+    if(this.airTime > 0){
+      this.airTime --;
+      this.airTime *= this.decRate;
     }
-    // Going left
-    if(keyIsDown(LEFT_ARROW)){
-      this.vx=-this.speed;
+    else{
+      if(keyIsDown(RIGHT_ARROW)){
+        this.vx = this.speed;
+      }
+      if(keyIsDown(LEFT_ARROW)){
+        this.vx = -this.speed;
+      }
+      
     }
     if(keyIsDown(UP_ARROW)){
     //Right wall side
-    if(this.onWall && !this.onGround && this.wallJumpRemaining > 0){
+    if(this.onWall && !this.onGround){
       if(this.wallSide === 1){
       this.vy = this.jumpP;
       this.vx = this.pushBack;
       this.onWall = false;
       this.onGround = false;
-      this.wallJumpRemaining --;
+      this.airTime = this.airMax;
+      // this.wallJumpRemaining --;
     }
     //left wall side
     if(this.wallSide === 2){
@@ -111,7 +117,8 @@ class Bob{
       this.vx = -this.pushBack;
       this.onWall = false;
       this.onGround = false;
-      this.wallJumpRemaining --;
+      this.airTime = this.airMax;
+      // this.wallJumpRemaining --;
     }
     }
     // if Bob is on the ground
@@ -119,19 +126,23 @@ class Bob{
       this.vy = this.jumpP;
       this.onGround = false;
       this.onWall = false;
-      this.wallJumpRemaining = 2;
+      // this.wallJumpRemaining = 2;
     }
     }
-    this.vx *= 0.9;
+    this.vx *= this.decRate;
     this.x += this.vx;
 
 }
+
+// Gravity
   gravity(){
     this.y += this.vy;
     this.vy += this.g;
     this.onGround = false;
 
-  }
+}
+
+  // When Bob is on the ground
   collisionPlatsA(){
     for(let p of plat){
       if(
@@ -160,6 +171,7 @@ class Bob{
   }
 
 }
+// When Bob is colliding or touching the wall
 wallCollision(){
   this.onWall = false;
   for(let w of plat){
