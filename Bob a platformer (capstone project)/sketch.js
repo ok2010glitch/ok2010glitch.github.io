@@ -7,30 +7,17 @@
 
 // Global Variables
 let level = 1;
-let plat = [];
+let plat;
 let player;
 let canvasW = 1300;
 let canvasH = 670;
 
 function setup() {
   createCanvas(canvasW,canvasH);
-  plat.push(new platform(0,590,canvasW,200));
+  changingLevels();
   player = new Bob(20 ,25);  
   
-if(level === 1){
-  plat.push(new platform(30,470,300,50));
-  plat.push(new platform(520,400,150,50));
-  plat.push(new platform(750,300,100,40));
-  plat.push(new platform(1000,200,70,80));
-  plat.push(new platform(-10,0,10,canvasH));
- }
-if(level === 2){
-  plat.push(new platform(50,560,200,50));
-  plat.push(new platform(320,500,150,50));
-  plat.push(new platform(750,300,100,40));
-  plat.push(new platform(1100,200,70,100));
 
-  }
 
   
 }
@@ -44,13 +31,31 @@ function draw() {
     }
 
 
-  
   player.collisionPlatsA();
   player.movement();
   player.wallCollision();
   player.levelChanging();
   }
 function changingLevels(){
+  plat = [];
+  plat.push(new platform(0,590,canvasW,200));
+  if(level === 1){
+  plat.push(new platform(30,470,300,50));
+  plat.push(new platform(520,400,150,50));
+  plat.push(new platform(750,300,100,40));
+  plat.push(new platform(1000,200,70,80));
+  plat.push(new platform(-10,0,10,canvasH));
+ }
+ if(level === 2){
+  plat.push(new platform(50,450,200,50));
+  plat.push(new platform(320,500,150,50));
+  plat.push(new platform(750,300,100,40));
+  plat.push(new platform(1100,200,70,100));
+
+  }
+
+
+  
 
 }
 class Bob{
@@ -66,7 +71,7 @@ class Bob{
     this.onGround = false;
     this.onWall = false;
     this.wallSide = 0;
-    this.pushBack = 10;
+    this.pushBack = 20;
     this.jumpA = 2; // jumps avalaible
     this.wallJumpRemaining = this.jumpA;
   }
@@ -91,7 +96,7 @@ class Bob{
       this.vx=-this.speed;
     }
     if(keyIsDown(UP_ARROW)){
-    //Right wall
+    //Right wall side
     if(this.onWall && !this.onGround && this.wallJumpRemaining > 0){
       if(this.wallSide === 1){
       this.vy = this.jumpP;
@@ -100,7 +105,7 @@ class Bob{
       this.onGround = false;
       this.wallJumpRemaining --;
     }
-    //left wall
+    //left wall side
     if(this.wallSide === 2){
       this.vy = this.jumpP;
       this.vx = -this.pushBack;
@@ -180,12 +185,12 @@ wallCollision(){
 levelChanging(){
   if(this.x > canvasW){
     level += 1;
+    changingLevels();
+    this.x = 20;
+    this.y = 25;
+    this.vy = 0;
   }
-
 }
-    
-  
-
 }
 
 class platform{
@@ -196,8 +201,11 @@ class platform{
     this.h = h;
   }
   create(){
+    let toppingHieght = 10
     fill(28, 27, 27);
     rect(this.xp,this.yp,this.w,this.h);
+    fill("orange");
+    rect(this.xp,this.yp ,this.w, toppingHieght)
 
   }
 }
