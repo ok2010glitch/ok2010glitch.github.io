@@ -31,12 +31,15 @@ function draw() {
   player.movement();
   player.wallCollision();
   player.levelChanging();
+  // fill("purple")
+  // textSize(16);
+  // text("X: " + mouseX + "  Y: " + mouseY, mouseX + 20, mouseY);
   }
 function changingLevels(){
   plat = [];
   plat.push(new platform(0,590,canvasW,200));
   if(level === 1){
-  plat.push(new platform(30,470,300,50));
+  plat.push(new platform(30,430,90,50));
   plat.push(new platform(520,400,150,50));
   plat.push(new platform(750,300,100,40));
   plat.push(new platform(1000,200,70,80));
@@ -49,10 +52,6 @@ function changingLevels(){
   plat.push(new platform(1100,200,70,100));
 
   }
-
-
-  
-
 }
 class Bob{
   constructor(x,y){
@@ -61,16 +60,16 @@ class Bob{
     this.size = 60;
     this.vy = 0; // velocity y
     this.g = 0.5; // gravity
-    this.vx = 0;
+    this.vx = 0; // velocity x
     this.speed = 5; //speed for player
     this.jumpP = -10; // jump power
-    this.onGround = false;
+    this.onGround = false; // true -> on Ground, false 
     this.onWall = false;
     this.wallSide = 0;
     this.pushBack = 5;
     this.jumpA = 2; // jumps avalaible
     this.airTime = 0;
-    this.airMax = 20;
+    this.airMax = 20; // maximum time bob can be in the air
     this.decRate = 0.9; //deceleration rate 
     // this.wallJumpRemaining = this.jumpA;
   }
@@ -204,7 +203,6 @@ levelChanging(){
   }
 }
 }
-
 class platform{
   constructor(x,y,w,h){
     this.xp = x;
