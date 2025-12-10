@@ -15,7 +15,7 @@ let canvasH = 670;
 function setup() {
   createCanvas(canvasW,canvasH);
   changingLevels();
-  player = new Bob(20 ,25);  
+  player = new Bob(20 ,470);  
 }
 
 function draw() {
@@ -31,19 +31,22 @@ function draw() {
   player.movement();
   player.wallCollision();
   player.levelChanging();
-  // fill("purple")
-  // textSize(16);
-  // text("X: " + mouseX + "  Y: " + mouseY, mouseX + 20, mouseY);
+  //--FOR PLACING THE PLATFORMS--
+  fill("white");
+  textSize(16);
+  let roundedX = round(mouseX);
+  let roundedY = round(mouseY);
+  text("X: " + roundedX + "   Y: " + roundedY, mouseX + 20, mouseY);
+  //----------------
   }
 function changingLevels(){
   plat = [];
-  plat.push(new platform(0,590,canvasW,200));
   if(level === 1){
-  plat.push(new platform(30,430,90,50));
-  plat.push(new platform(520,400,150,50));
-  plat.push(new platform(750,300,100,40));
-  plat.push(new platform(1000,200,70,80));
+  plat.push(new platform(0,515,550,canvasH-515));
+  plat.push(new platform(830,515,canvasW,canvasH-515));
+  plat.push(new platform(610,390,100,35));
   plat.push(new platform(-10,0,10,canvasH));
+  plat.push(new platform(0,0,410,200));
  }
  if(level === 2){
   plat.push(new platform(50,450,200,50));
@@ -57,7 +60,7 @@ class Bob{
   constructor(x,y){
     this.x = x;
     this.y = y;
-    this.size = 60;
+    this.size = 40;
     this.vy = 0; // velocity y
     this.g = 0.5; // gravity
     this.vx = 0; // velocity x
@@ -77,12 +80,10 @@ class Bob{
     noStroke();   
     fill("white");
     square(this.x,this.y,this.size,5);
-    fill("black")
-    square(this.x+10,this.y+10,15,5);
-    square(this.x+35,this.y+10,15,5);
-    fill("white");
-    square(this.x+15,this.y+15,5,2);
-    square(this.x+40,this.y+15,5,2);
+    fill("black");
+    square(this.x + 8, this.y + 9,8,2);
+    square(this.x + 24, this.y + 9,8,2);
+
   }
   movement(){
     // Going right
@@ -212,10 +213,8 @@ class platform{
   }
   create(){
     let toppingHieght = 10
-    fill(28, 27, 27);
+    fill(136, 137, 138);
     rect(this.xp,this.yp,this.w,this.h);
-    fill("orange");
     rect(this.xp,this.yp ,this.w, toppingHieght)
-
   }
 }
