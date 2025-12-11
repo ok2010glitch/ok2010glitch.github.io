@@ -27,7 +27,7 @@ function draw() {
     }
 
 
-  player.collisionPlatsA();
+  player.collisions();
   player.movement();
   player.wallCollision();
   player.levelChanging();
@@ -44,9 +44,15 @@ function changingLevels(){
   if(level === 1){
   plat.push(new platform(0,515,550,canvasH-515));
   plat.push(new platform(830,515,canvasW,canvasH-515));
-  plat.push(new platform(610,390,100,35));
-  plat.push(new platform(-10,0,10,canvasH));
+  //platform between the hole
+  plat.push(new platform(610,390,100,40));
   plat.push(new platform(0,0,410,200));
+  // Wall at the end of the canvas
+  plat.push(new platform(1200, 148, canvasW - 1200, canvasH));
+  //Extension for wall at the end
+  plat.push(new platform(1070, 148, 130, 50));
+  // A platform after the platform bewtween the hole
+  plat.push(new platform(840,260,90,40));
  }
  if(level === 2){
   plat.push(new platform(50,450,200,50));
@@ -68,13 +74,14 @@ class Bob{
     this.jumpP = -10; // jump power
     this.onGround = false; // true -> on Ground, false 
     this.onWall = false;
-    this.wallSide = 0;
-    this.pushBack = 5;
+    this.wallSide = 0; // 1 -> RIGHT, 2 -> LEFT
+    this.pushBack = 5; // Going back while wall jumps
     this.jumpA = 2; // jumps avalaible
-    this.airTime = 0;
-    this.airMax = 20; // maximum time bob can be in the air
-    this.decRate = 0.9; //deceleration rate 
-    // this.wallJumpRemaining = this.jumpA;
+    this.airTime = 0; // time when Bob stays in the air
+    this.airMax = 20; // maximum time Bob can be in the air
+    this.decRate = 0.9; //deceleration rate
+    this.timeToRevive; // for having a smooth delay after each revive
+    this.dead = false; // checks if bob died or no
   }
   body(){
     noStroke();   
@@ -83,7 +90,22 @@ class Bob{
     fill("black");
     square(this.x + 8, this.y + 9,8,2);
     square(this.x + 24, this.y + 9,8,2);
-
+    // If Bob is goes out of the ground throught the hole
+    // Checks if Bob goes out
+    if(!this.dead && this.y > canvasH){
+      this.dead = true;
+      this.timeToRevive = 120;
+    }
+    // reviver timer starts to count down
+    if(this.dead){
+      this.timeToRevive--;
+      if(this.timeToRevive <= 0){
+        this.dead = false;
+        this.x = 20;
+        this.y = 470;
+      }
+    }
+    
   }
   movement(){
     // Going right
@@ -97,6 +119,12 @@ class Bob{
       }
       if(keyIsDown(LEFT_ARROW)){
         this.vx = -this.speed;
+    // Bob can't go out of the map from the left side
+    if(this.x <= 0){
+      this.x = 0;
+      this.vx = 0;
+    }
+    
       }
       
     }
@@ -109,7 +137,6 @@ class Bob{
       this.onWall = false;
       this.onGround = false;
       this.airTime = this.airMax;
-      // this.wallJumpRemaining --;
     }
     //left wall side
     if(this.wallSide === 2){
@@ -118,7 +145,6 @@ class Bob{
       this.onWall = false;
       this.onGround = false;
       this.airTime = this.airMax;
-      // this.wallJumpRemaining --;
     }
     }
     // if Bob is on the ground
@@ -129,7 +155,7 @@ class Bob{
       // this.wallJumpRemaining = 2;
     }
     }
-    this.vx *= this.decRate;
+    this.vx *= this.decRate; // gives a sliding effect for Bob
     this.x += this.vx;
 
 }
@@ -142,13 +168,14 @@ class Bob{
 
 }
 
-  // When Bob is on the ground
-  collisionPlatsA(){
+//checks through all of the platforms
+  collisions(){
     for(let p of plat){
       if(
         this.x + this.size > p.xp &&
         this.x < p.xp + p.w 
       ){
+        // if Bob is on the ground
         if(
           this.y + this.size > p.yp &&
           this.y + this.size < p.yp + p.h &&
@@ -158,18 +185,16 @@ class Bob{
           this.vy = 0;
           this.onGround = true;
         }
+        // if hitting the ceiling
         if(
           this.y < p.yp + p.h &&
           this.y > p.yp && this.vy < 0
         ){
           this.y = p.yp + p.h;
           this.vy = 0;
-
         }
       }
-
-  }
-
+    }
 }
 // When Bob is colliding or touching the wall
 wallCollision(){
@@ -177,7 +202,7 @@ wallCollision(){
   for(let w of plat){
     let vr = this.y + this.size > w.yp && this.y < w.yp+w.h;
     // right side
-    if(vr && this.x < w.xp + w.w && this.x > w.xp + w.w - 5){
+    if(vr && this.x < w.xp + w.w && this.x > w.xp + w.w ){
       this.x = w.xp + w.w;
       this.vx = 0;
       this.onWall = true;
@@ -196,7 +221,7 @@ wallCollision(){
 
 levelChanging(){
   if(this.x > canvasW){
-    level += 1;
+    level += 1; // add to the levels chaning the levels
     changingLevels();
     this.x = 20;
     this.y = 25;
@@ -204,17 +229,22 @@ levelChanging(){
   }
 }
 }
+
 class platform{
   constructor(x,y,w,h){
     this.xp = x;
     this.yp = y;
-    this.w = w;
-    this.h = h;
+    this.w = w; // width of the platform
+    this.h = h; // height of the platform
   }
   create(){
     let toppingHieght = 10
     fill(136, 137, 138);
     rect(this.xp,this.yp,this.w,this.h);
-    rect(this.xp,this.yp ,this.w, toppingHieght)
+    rect(this.xp,this.yp ,this.w, toppingHieght);
   }
+}
+
+class spikes{
+
 }
