@@ -15,7 +15,7 @@ let canvasH = 670;
 function setup() {
   createCanvas(canvasW,canvasH);
   changingLevels();
-  player = new Bob(20 ,470);  
+  player = new Bob(20 ,222);  
 }
 
 function draw() {
@@ -55,12 +55,9 @@ function changingLevels(){
   plat.push(new platform(840,260,90,40));
  }
  if(level === 2){
-  plat.push(new platform(50,450,200,50));
-  plat.push(new platform(320,500,150,50));
-  plat.push(new platform(750,300,100,40));
-  plat.push(new platform(1100,200,70,100));
-
-  }
+  plat.push(new platform(0,500,400,50));
+  plat.push(new platform(620,420,100,30));
+}
 }
 class Bob{
   constructor(x,y){
@@ -102,7 +99,7 @@ class Bob{
       if(this.timeToRevive <= 0){
         this.dead = false;
         this.x = 20;
-        this.y = 470;
+        this.y = 222;
       }
     }
     
@@ -202,7 +199,7 @@ wallCollision(){
   for(let w of plat){
     let vr = this.y + this.size > w.yp && this.y < w.yp+w.h;
     // right side
-    if(vr && this.x < w.xp + w.w && this.x > w.xp + w.w ){
+    if(vr && this.x < w.xp + w.w && this.x > w.xp + w.w -10 ){
       this.x = w.xp + w.w;
       this.vx = 0;
       this.onWall = true;
@@ -231,20 +228,29 @@ levelChanging(){
 }
 
 class platform{
-  constructor(x,y,w,h){
+  constructor(x,y,w,h, pvx, startX, endX){
     this.xp = x;
     this.yp = y;
     this.w = w; // width of the platform
     this.h = h; // height of the platform
+    // For moving platforms
+    this.pvx = pvx;
+    this.st = startX;
+    this.et = endX;
+    this.xp = this.st;
   }
+
   create(){
     let toppingHieght = 10
     fill(136, 137, 138);
     rect(this.xp,this.yp,this.w,this.h);
     rect(this.xp,this.yp ,this.w, toppingHieght);
   }
+//   movingPs(){
+//     if()
+    
+// }
 }
-
 class spikes{
 
 }
