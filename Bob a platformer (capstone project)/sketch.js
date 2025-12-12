@@ -24,6 +24,7 @@ function draw() {
   player.gravity();
     for(let p of plat){
       p.create();
+      p.movingPs();
     }
 
 
@@ -42,21 +43,21 @@ function draw() {
 function changingLevels(){
   plat = [];
   if(level === 1){
-  plat.push(new platform(0,515,550,canvasH-515));
-  plat.push(new platform(830,515,canvasW,canvasH-515));
+  plat.push(new platform(0,515,550,canvasH-515,0));
+  plat.push(new platform(830,515,canvasW,canvasH-515,0));
   //platform between the hole
-  plat.push(new platform(610,390,100,40));
-  plat.push(new platform(0,0,410,200));
+  plat.push(new platform(610,390,100,40,0));
+  plat.push(new platform(0,0,410,200,0));
   // Wall at the end of the canvas
-  plat.push(new platform(1200, 148, canvasW - 1200, canvasH));
+  plat.push(new platform(1200, 148, canvasW - 1200, canvasH,0));
   //Extension for wall at the end
-  plat.push(new platform(1070, 148, 130, 50));
+  plat.push(new platform(1070, 148, 130, 50,0));
   // A platform after the platform bewtween the hole
-  plat.push(new platform(840,260,90,40));
+  plat.push(new platform(840,260,90,40,0));
  }
  if(level === 2){
-  plat.push(new platform(0,500,400,50));
-  plat.push(new platform(620,420,100,30));
+  plat.push(new platform(0,500,400,50,0));
+  plat.push(new platform(620,420,100,30,2));
 }
 }
 class Bob{
@@ -100,6 +101,8 @@ class Bob{
         this.dead = false;
         this.x = 20;
         this.y = 222;
+        this.vx = 0;
+        this.vy = 0;
       }
     }
     
@@ -228,29 +231,40 @@ levelChanging(){
 }
 
 class platform{
-  constructor(x,y,w,h, pvx, startX, endX){
+  constructor(x,y,w,h,vx){
     this.xp = x;
     this.yp = y;
     this.w = w; // width of the platform
     this.h = h; // height of the platform
-    // For moving platforms
-    this.pvx = pvx;
-    this.st = startX;
-    this.et = endX;
-    this.xp = this.st;
+    this.vx = vx;
   }
 
   create(){
     let toppingHieght = 10
     fill(136, 137, 138);
     rect(this.xp,this.yp,this.w,this.h);
+    fill(180, 180, 180);
     rect(this.xp,this.yp ,this.w, toppingHieght);
-  }
-//   movingPs(){
-//     if()
     
-// }
+  }
+  movingPs(){
+    // if(this.xp >= 620){
+    //   this.vx += 1
+    // }
+    
+    
+}
 }
 class spikes{
 
+}
+
+if(this.vx > 0){
+  if(this.xp >= 620){
+    this.vx += 1;
+  }
+  if(this.xp + this.w <= 900){
+    this.vx -= 1
+  }
+  this.xp += this.vx;
 }
