@@ -6,7 +6,7 @@
 // - describe what you did to take this project "above and beyond"
 
 // Global Variables
-let level = 0; 
+let level = 3; 
 let plat;
 let player;
 let canvasW = 1300;
@@ -15,7 +15,8 @@ let spike;
 
 function setup() {
   createCanvas(canvasW,canvasH);
-  player = new Bob(20 , 220);  
+  player = new Bob(20 , 220); 
+  levels(); 
 }
 
 function startingScreen(){
@@ -60,30 +61,27 @@ function draw() {
 function keyPressed(){
   if(level === 0 && keyCode === 32){
     level = 1;
-    changingLevels();
+    // levels();
   }
 }
 
-function changingLevels(){
+function levels(){
   plat = [];
   spike = [];
   if(level === 1){
   plat.push(new platform(0,515,550,canvasH-515,0,0));
   plat.push(new platform(830,515,canvasW,canvasH-515,0,0));
   //platform between the hole
-<<<<<<< HEAD
   plat.push(new platform(610,390,100,40,0));
   //Ceiling
   plat.push(new platform(0,-10,410,210,0));
-=======
   plat.push(new platform(610,390,100,40,0,0));
   //Ceiling
   plat.push(new platform(0,-10,410,200,0,canvasW));
->>>>>>> eace579604e71ed3888c19e48505061179b01e9e
   // Wall at the end of the canvas
   plat.push(new platform(1200, 148, canvasW - 1200, canvasH,0,0));
   //Extension for wall at the end
-  plat.push(new platform(1070, 148, 130, 50,0,0));
+  plat.push(new platform(1078, 148, 140, 50,0,0));
   // A platform after the platform bewtween the hole
   plat.push(new platform(840,260,90,40,0,0));
   // For having mulitple spikes in one row
@@ -105,7 +103,19 @@ function changingLevels(){
   plat.push(new platform(920,114,canvasW,40,0,0));
 }
 if(level === 3){
-  plat.push(new platform(0,540,210,40,0,0));
+  //sarting Platform
+  plat.push(new platform(-10,540,220,40,0,0));
+  //Wall under the ceiling
+  plat.push(new platform(280,180,80,200,0,0));
+  //Ceiling
+  plat.push(new platform(-10,-10,500,200,0,0));
+  //moving platform after the starting platform
+  plat.push(new platform(360,460,60,40,1,600));
+  // over the moving platform
+  plat.push(new platform(480,290,80,40,0,0));
+
+  plat.push(new platform(745,240,100,40,1.2,900));
+
 }
 }
 
@@ -308,7 +318,7 @@ spikesCollision(){
 levelChanging(){
   if(this.x > canvasW){
     level += 1; // add to the levels, changing the levels
-    changingLevels();
+    levels();
     this.x = 20;
     this.y = 222;
     this.vy = 0;
@@ -327,11 +337,11 @@ class platform{
     this.r = range; // range in which the platform can travel
   }
   create(){
-    let toppingHieght = 10
+    let toppingHieght = 10;
     fill(136, 137, 138);
-    rect(this.xp,this.yp,this.w,this.h);
+    rect(this.xp,this.yp,this.w,this.h,5);
     fill(211, 211, 211);
-    rect(this.xp,this.yp ,this.w, toppingHieght);
+    rect(this.xp,this.yp ,this.w, toppingHieght,5);
   }
   movingPlats(){
     this.xp += this.vx;
@@ -355,7 +365,7 @@ class platform{
 
 class spikes{
   constructor(x1,y1,x2,y2,x3,y3){
-    this.x1 = x1; // x coordinate for spikes
+    this.x1 = x1;
     this.y1 = y1;
     this.x2 = x2;
     this.y2 = y2;
