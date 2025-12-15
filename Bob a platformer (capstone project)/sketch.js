@@ -47,7 +47,8 @@ function changingLevels(){
   plat.push(new platform(830,515,canvasW,canvasH-515,0));
   //platform between the hole
   plat.push(new platform(610,390,100,40,0));
-  plat.push(new platform(0,0,410,200,0));
+  //Ceiling
+  plat.push(new platform(0,-10,410,210,0));
   // Wall at the end of the canvas
   plat.push(new platform(1200, 148, canvasW - 1200, canvasH,0));
   //Extension for wall at the end
