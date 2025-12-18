@@ -113,8 +113,14 @@ if(level === 3){
   plat.push(new platform(360,460,60,40,1,600));
   // over the moving platform
   plat.push(new platform(480,290,80,40,0,0));
-
+  // Another moving platform
   plat.push(new platform(745,240,100,40,1.2,900));
+  //spikes on the cieling
+  for(let i = 360; i < 480; i += 30){ // It is spaced 30 for each spike
+    spike.push(new spikes(i,190,i + 30/2,206,i + 30, 190));
+  }
+  //ceiling on the far right handside
+  plat.push(new platform(1120,-15,canvasW,200,0,0));
 
 }
 }
@@ -302,7 +308,8 @@ wallCollision(){
 spikesCollision(){
   for(let s of spike){
     if(this.x + this.size > s.x1 && this.x < s.x3   // spike's positions
-      && this.y + this.size > s.y2 && this.y < s.y1
+      && this.y + this.size > s.y2 && this.y < s.y1 ||
+      (this.y < s.y2)
     ){
       this.x = 20; // reset the player's position
       this.y = 222;
