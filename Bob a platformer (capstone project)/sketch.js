@@ -61,7 +61,7 @@ function draw() {
 function keyPressed(){
   if(level === 0 && keyCode === 32){
     level = 1;
-    // levels();
+    levels();
   }
 }
 
@@ -120,7 +120,11 @@ if(level === 3){
     spike.push(new spikes(i,190,i + 30/2,206,i + 30, 190));
   }
   //ceiling on the far right handside
+  plat.push(new platform(1170,175,200,200,0,0));
   plat.push(new platform(1120,-15,canvasW,200,0,0));
+  // the platform at the end where bob advances
+  plat.push(new platform(1110,480,40,40,1,1280));
+
 
 }
 }
@@ -308,11 +312,17 @@ wallCollision(){
 spikesCollision(){
   for(let s of spike){
     if(this.x + this.size > s.x1 && this.x < s.x3   // spike's positions
-      && this.y + this.size > s.y2 && this.y < s.y1 ||
-      (this.y < s.y2)
+      && this.y + this.size > s.y2 && this.y < s.y1
     ){
       this.x = 20; // reset the player's position
       this.y = 222;
+    }
+    else if(s.y2 > s.y1){
+      if(this.y < s.y2 && this.x + this.size > s.x1 && 
+        this.x < s.x3 && this.y <= s.y1){
+      this.x = 20; // reset the player's position
+      this.y = 222;
+        }
     }
   }
 
