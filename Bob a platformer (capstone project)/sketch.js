@@ -6,11 +6,11 @@
 // - describe what you did to take this project "above and beyond"
 
 // Global Variables
-let level = 3; 
-let plat;
-let player;
-let canvasW = 1300;
-let canvasH = 670;
+let level = 0; // stages of the game 
+let plat; // for platforms
+let player; // Bob 
+let canvasW = 1300; // canvas Width
+let canvasH = 670; // canvas Height
 let spike;
 
 function setup() {
@@ -26,6 +26,7 @@ function startingScreen(){
   text("Press Space",canvasW/2,canvasH/2);
 
 }
+
 function draw() {
   background("black");
   if(level === 0){
@@ -72,10 +73,9 @@ function levels(){
   plat.push(new platform(0,515,550,canvasH-515,0,0));
   plat.push(new platform(830,515,canvasW,canvasH-515,0,0));
   //platform between the hole
-  plat.push(new platform(610,390,100,40,0));
+  plat.push(new platform(610,390,100,40,0,0));
   //Ceiling
   plat.push(new platform(0,-10,410,210,0));
-  plat.push(new platform(610,390,100,40,0,0));
   //Ceiling
   plat.push(new platform(0,-10,410,200,0,canvasW));
   // Wall at the end of the canvas
@@ -94,6 +94,11 @@ function levels(){
   plat.push(new platform(290,90,110,170,0,0));
   plat.push(new platform(0,-10,400,110,0,0));
   plat.push(new platform(1180,135,canvasW - 1180, canvasH,0,0));
+  plat.push(new platform(390,-10,325,25,0,0));
+  //spikes on the ceiling
+   for(let i = 410; i < 700; i += 30){ // It is spaced 30 for each spike
+    spike.push(new spikes(i,15,i + 30/2,30,i + 30, 15));
+  }
   // starting platform
   plat.push(new platform(0,515,200,40,0,0));
   //moving platforms
@@ -103,7 +108,7 @@ function levels(){
   plat.push(new platform(920,114,canvasW,40,0,0));
 }
 if(level === 3){
-  //sarting Platform
+  //starting Platform
   plat.push(new platform(-10,540,220,40,0,0));
   //Wall under the ceiling
   plat.push(new platform(280,180,80,200,0,0));
@@ -122,14 +127,39 @@ if(level === 3){
   //ceiling on the far right handside
   plat.push(new platform(1170,175,200,200,0,0));
   plat.push(new platform(1120,-15,canvasW,200,0,0));
-  // the platform at the end where bob advances
-  plat.push(new platform(1110,480,40,40,1,1280));
+  // the platform at the end where bob advances (moving platform)
+  plat.push(new platform(1110,480,70,40,1,1280));
+  //wall outside of the canvas
+  plat.push(new platform(canvasW + 10,canvasH,4,4999,0,0));
 
+}
+if(level === 4){
+  // starting platform
+  plat.push(new platform(-10,490,220,40,0,0));
+  // platform after the starting platform standing on the air
+  plat.push(new platform(330,230,50,150,0,0));
+  // L-shaped platform after the platform in the air
+  plat.push(new platform(820,170,40,200,0,0));
+  plat.push(new platform(540,170,300,50,0,0));
+  plat.push(new platform(540,90,40,100,0,0));
+  //spikes on the L-shaped platform
+  for(let i = 180; i < 320; i += 30){ // It is spaced 30 for each spike
+    spike.push(new spikes(860,i,890,i + 30/2,860, i+30));
+  }
+  //moving platform
+  plat.push(new platform(1080,150,60,40,1,1280))
+  //wall L-shaped after the moving platform
+  plat.push(new platform(930,-15,500,30,0,0));
+  plat.push(new platform(canvasW-20,-10,20,canvasH-100,0,0));
 
+  plat.push(new platform(1230,canvasH-60,160,40,0,0));
+  //wall out of the canvas
+  plat.push(new platform(canvasW + 10,canvasH,4,4999,0,0));
 }
 }
 
 class Bob{
+  //Constructor
   constructor(x,y){
     this.x = x;
     this.y = y;
@@ -164,14 +194,13 @@ class Bob{
     // Checks if Bob goes out
     if(!this.dead && this.y > canvasH){
       this.dead = true;
-      this.timeToRevive = 120;
+      this.timeToRevive = 70;
     }
     // reviver timer starts to count down
     if(this.dead){
       this.timeToRevive--;
       if(this.timeToRevive <= 0){
         this.dead = false;
-        this.touchingSpike = false;
         this.x = 20;
         this.y = 220;
         this.vx = 0;
@@ -264,7 +293,7 @@ class Bob{
           this.y + this.size < p.yp + p.h &&
           this.vy >= 0
         ){
-          this.y = p.yp - this.size;
+          this.y = p.yp - this.size; //Places bob on the platformer
           this.vy = 0;
           this.onGround = true;
           if(p.vx !== 0){
@@ -277,7 +306,7 @@ class Bob{
           this.y < p.yp + p.h &&
           this.y > p.yp && this.vy < 0
         ){
-          this.y = p.yp + p.h;
+          this.y = p.yp + p.h; // Places Bob under the platform
           this.vy = 0;
         }
       }
@@ -309,25 +338,54 @@ wallCollision(){
   }
 }
 
+
 spikesCollision(){
   for(let s of spike){
-    if(this.x + this.size > s.x1 && this.x < s.x3   // spike's positions
-      && this.y + this.size > s.y2 && this.y < s.y1
+    // if spikes on the ground
+    if(s.y1 > s.y2 && s.x1 !== s.x3){
+    if(
+      this.x + this.size > s.x1 && // Bob going further from the first point of the spkie
+      this.x < s.x3 && // Bob is between the spikes
+      this.y + this.size > s.y2 && // Bob is on the spikes
+      this.y < s.y1 // Bob falling on the spikes
     ){
-      this.x = 20; // reset the player's position
-      this.y = 222;
+      this.x = 20; // reset the player's x position
+      this.y = 222; // reset the player's y position
+      this.vx = 0;
+      this.vy = 0;
     }
-    else if(s.y2 > s.y1){
-      if(this.y < s.y2 && this.x + this.size > s.x1 && 
-        this.x < s.x3 && this.y <= s.y1){
-      this.x = 20; // reset the player's position
-      this.y = 222;
-        }
+  } 
+    // if spikes are on the ceiling
+    else if(s.y2 > s.y3){
+      if(
+        this.x + this.size > s.x1 && 
+        this.x < s.x3 &&
+        this.y < s.y2 &&
+        this.y <= s.y1){
+          this.x = 20; // reset the player's x position
+          this.y = 222; // reset the player's y position
+          this.vx = 0;
+          this.vy = 0;
+      }
+    }
+    // for side ways spikes pointing to the right
+    else if(s.y1 < s.y2 && s.x1 === s.x3){
+      if(
+        this.y + this.size > s.y1 && 
+        this.y + this.size < s.y3 &&
+        this.x + this.size > s.x1 &&
+        this.x < s.x2
+      ){
+        this.x = 20;
+        this.y = 222;
+        this.vx = 0;
+        this.vy = 0;
+      }
     }
   }
 
 }
-//----------------------------------------------------------------
+//--------------------------------------------------------------------------//
 
 
 //--------------------------------LEVEL CHANGING-----------------------------------------
@@ -342,6 +400,8 @@ levelChanging(){
   }
 }
 }
+
+//-----------------------------------------PLATFORM-------------------------------------------
 
 class platform{
   constructor(x,y,w,h,vx,range){
@@ -380,6 +440,8 @@ class platform{
   }
 }
 
+//--------------------------------------------SPIKES----------------------------------------------
+
 class spikes{
   constructor(x1,y1,x2,y2,x3,y3){
     this.x1 = x1;
@@ -393,5 +455,18 @@ class spikes{
     strokeWeight(2);
     fill(211, 211, 211);
     triangle(this.x1,this.y1,this.x2,this.y2,this.x3,this.y3);
+  }
+}
+
+//----------------------------------------------ENIMIES----------------------------------------------
+
+class enemies{
+  constructor(x,y){
+    this.x = x;
+    this.y = y;
+    this.vx = 0;
+  }
+  move(){
+
   }
 }
