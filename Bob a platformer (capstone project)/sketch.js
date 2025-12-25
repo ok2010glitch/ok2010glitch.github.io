@@ -3,7 +3,10 @@
 // Date
 //
 // Extra for Experts:
-// - describe what you did to take this project "above and beyond"
+// - Wall Jumping mechanics
+// - Moving platform that carries the player
+// - Mulitple spike orientations (ground,ceiling,sideways)
+// - Level using system using classes and objects
 
 // Global Variables
 let level = 0; // stages of the game 
@@ -12,6 +15,7 @@ let player; // Bob
 let canvasW = 1300; // canvas Width
 let canvasH = 670; // canvas Height
 let spike;
+let enemy;
 
 function setup() {
   createCanvas(canvasW,canvasH);
@@ -36,13 +40,19 @@ function draw() {
 
   player.body();
   player.gravity();
+  //generates platforms
   for(let p of plat){
     p.movingPlats();
     p.create();
-      
   }
+  // Generates spikes
   for(let s of spike){
     s.display()
+  }
+  //generates enemies
+  for(let e of enemy){
+    e.display();
+    e.move();
   }
 
   player.collisions();
@@ -69,6 +79,7 @@ function keyPressed(){
 function levels(){
   plat = [];
   spike = [];
+  enemy = [];
   if(level === 1){
   plat.push(new platform(0,515,550,canvasH-515,0,0));
   plat.push(new platform(830,515,canvasW,canvasH-515,0,0));
@@ -146,6 +157,8 @@ if(level === 4){
   for(let i = 180; i < 320; i += 30){ // It is spaced 30 for each spike
     spike.push(new spikes(860,i,890,i + 30/2,860, i+30));
   }
+  // red minion
+  enemy.push(new enemies(600,130,2,790));
   //moving platform
   plat.push(new platform(1080,150,60,40,1,1280))
   //wall L-shaped after the moving platform
@@ -159,7 +172,6 @@ if(level === 4){
 }
 
 class Bob{
-  //Constructor
   constructor(x,y){
     this.x = x;
     this.y = y;
@@ -184,9 +196,11 @@ class Bob{
   //-------------------------BOB'S DESIGN-----------------------------------
   
   body(){
-    noStroke();   
+    noStroke();
+    //Body   
     fill("white");
     square(this.x,this.y,this.size,5);
+    //Eyes
     fill("black");
     square(this.x + 8, this.y + 9,8,2);
     square(this.x + 24, this.y + 9,8,2);
@@ -212,7 +226,7 @@ class Bob{
 // -----------------------------MOVEMENT----------------------------
   
   movement(){
-    if(this.airTime > 0){ // this is producing the smooth curve
+    if(this.airTime > 0){ // this is producing the smooth curve when in the air
       this.airTime --;
       this.airTime *= this.decRate; // making Bob slow down while in the air
     }
@@ -224,18 +238,17 @@ class Bob{
       //Left movement
       if(keyIsDown(LEFT_ARROW)){
         this.vx = -this.speed;
-    // Bob can't go out of the map from the left side
+// prevents Bob from leaving the map      
     if(this.x <= 0){
       this.x = 0;
       this.vx = 0;
     }
-    
-      }
+  }
       
     }
-    // Going up
-    if(keyIsDown(UP_ARROW)){
     
+    //Jumping logic
+    if(keyIsDown(UP_ARROW)){
       //Right wall side
     if(this.onWall && !this.onGround){
       if(this.wallSide === 1){
@@ -338,7 +351,6 @@ wallCollision(){
   }
 }
 
-
 spikesCollision(){
   for(let s of spike){
     // if spikes on the ground
@@ -383,6 +395,9 @@ spikesCollision(){
       }
     }
   }
+}
+
+enemyCollision(){
 
 }
 //--------------------------------------------------------------------------//
@@ -413,6 +428,7 @@ class platform{
     this.vx = vx; // velocity x
     this.r = range; // range in which the platform can travel
   }
+
   create(){
     let toppingHieght = 10;
     fill(136, 137, 138);
@@ -420,6 +436,8 @@ class platform{
     fill(211, 211, 211);
     rect(this.xp,this.yp ,this.w, toppingHieght,5);
   }
+
+  // moving platform back and forth
   movingPlats(){
     this.xp += this.vx;
 
@@ -428,7 +446,7 @@ class platform{
     }  
     // moving left
       if(this.xp + this.w >= this.r){
-      this.xp = this.r - this.w; // goes to the same position
+      this.xp = this.r - this.w;
       this.vx = -this.vx;
 
     }
@@ -461,12 +479,38 @@ class spikes{
 //----------------------------------------------ENIMIES----------------------------------------------
 
 class enemies{
-  constructor(x,y){
-    this.x = x;
-    this.y = y;
-    this.vx = 0;
+  constructor(x,y,vx,r){
+    this.xStart = x;
+    this.xe = x;
+    this.ye = y;
+    this.eSize = 40;
+    this.vx = vx;
+    this.rg = r; // range in which the enemy/obstacle can travel
+  }
+  display(){
+    noStroke();
+    //Body   
+    fill("red");
+    square(this.xe,this.ye,this.eSize,5);
+    //Eyes
+    fill("white");
+    square(this.xe + 8, this.ye + 9,8,2);
+    square(this.xe + 24, this.ye + 9,8,2);
   }
   move(){
+    this.xe += this.vx;
+    
+    // moving left
+      if(this.xe + this.eSize >= this.rg){
+      this.xe = this.rg - this.eSize;
+      this.vx *= -1;
+
+    }
+    //moving right
+    else if(this.xe <= this.xStart){
+      this.xe = this.xStart;
+      this.vx *= -1;
+    }  
 
   }
 }
