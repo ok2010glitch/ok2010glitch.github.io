@@ -9,7 +9,7 @@
 // - Level using system using classes and objects
 
 // Global Variables
-let level = 0; // stages of the game 
+let level = 4; // stages of the game 
 let plat; // for platforms
 let player; // Bob 
 let canvasW = 1300; // canvas Width
@@ -36,10 +36,27 @@ function draw() {
   if(level === 0){
     startingScreen();
     return;
+  }  
+player.handleDeath();
+player.gravity();
+player.collisions();
+
+
+if(player.dead){
+  player.deadBody();
+
+}else{
+  player.body();
+  player.movement();
+  player.wallCollision();
+  player.levelChanging();
+  player.spikesCollision();
+  player.enemyCollision();
   }
 
-  player.body();
-  player.gravity();
+
+
+
   //generates platforms
   for(let p of plat){
     p.movingPlats();
@@ -55,11 +72,8 @@ function draw() {
     e.move();
   }
 
-  player.collisions();
-  player.movement();
-  player.wallCollision();
-  player.levelChanging();
-  player.spikesCollision();
+  // Player physics (Collision, movement)
+
   //--TOOL FOR PLACING PLATFORMS IN THE RIGHT PLACE--
   fill("white");
   textSize(16);
@@ -97,7 +111,7 @@ function levels(){
   plat.push(new platform(840,260,90,40,0,0));
   // For having mulitple spikes in one row
   for(let i = 900; i < 1100; i += 30){ // It is spaced 30 for each spike
-    spike.push(new spikes(i,515,i + 30/2,485,i + 30, 515));
+    spike.push(new spikes(i,515,i + 30/2,495,i + 30, 515));
   }
 }
  if(level === 2){
@@ -108,7 +122,7 @@ function levels(){
   plat.push(new platform(390,-10,325,25,0,0));
   //spikes on the ceiling
    for(let i = 410; i < 700; i += 30){ // It is spaced 30 for each spike
-    spike.push(new spikes(i,15,i + 30/2,30,i + 30, 15));
+    spike.push(new spikes(i,15,i + 30/2,35,i + 30, 15));
   }
   // starting platform
   plat.push(new platform(0,515,200,40,0,0));
@@ -133,7 +147,7 @@ if(level === 3){
   plat.push(new platform(745,240,100,40,1.2,900));
   //spikes on the cieling
   for(let i = 360; i < 480; i += 30){ // It is spaced 30 for each spike
-    spike.push(new spikes(i,190,i + 30/2,206,i + 30, 190));
+    spike.push(new spikes(i,190,i + 30/2,210,i + 30, 190));
   }
   //ceiling on the far right handside
   plat.push(new platform(1170,175,200,200,0,0));
@@ -155,12 +169,12 @@ if(level === 4){
   plat.push(new platform(540,90,40,100,0,0));
   //spikes on the L-shaped platform
   for(let i = 180; i < 320; i += 30){ // It is spaced 30 for each spike
-    spike.push(new spikes(860,i,890,i + 30/2,860, i+30));
+    spike.push(new spikes(860,i,880,i + 30/2,860, i+30));
   }
   // red minion
   enemy.push(new enemies(600,130,2,790));
   //moving platform
-  plat.push(new platform(1080,150,60,40,1,1280))
+  plat.push(new platform(1080,150,60,40,1,1220));
   //wall L-shaped after the moving platform
   plat.push(new platform(930,-15,500,30,0,0));
   plat.push(new platform(canvasW-20,-10,20,canvasH-100,0,0));
@@ -169,6 +183,7 @@ if(level === 4){
   //wall out of the canvas
   plat.push(new platform(canvasW + 10,canvasH,4,4999,0,0));
 }
+
 }
 
 class Bob{
@@ -206,7 +221,12 @@ class Bob{
     square(this.x + 24, this.y + 9,8,2);
     // If Bob is goes out of the ground throught the hole
     // Checks if Bob goes out
-    if(!this.dead && this.y > canvasH){
+    
+    
+}
+
+handleDeath(){
+  if(!this.dead && this.y > canvasH){
       this.dead = true;
       this.timeToRevive = 70;
     }
@@ -221,8 +241,13 @@ class Bob{
         this.vy = 0;
       }
     }
-    
-  }
+}
+
+deadBody(){
+  noStroke()
+  fill("white")
+  square(this.x,this.y,5,2);
+}
 // -----------------------------MOVEMENT----------------------------
   
   movement(){
@@ -398,6 +423,17 @@ spikesCollision(){
 }
 
 enemyCollision(){
+  for(let e of enemy){
+    if(
+      this.x + this.size > e.xe &&
+      this.x < e.xe + e.eSize &&
+      this.y + this.size > e.ye &&
+      this.y < e.ye + e.eSize
+    ){
+      this.timeToRevive = 70;
+      this.dead = true;
+    }
+  }
 
 }
 //--------------------------------------------------------------------------//
