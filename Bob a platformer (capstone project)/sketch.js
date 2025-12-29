@@ -9,7 +9,7 @@
 // - Level using system using classes and objects
 
 // Global Variables
-let level = 4; // stages of the game 
+let level = 0; // stages of the game 
 let plat; // for platforms
 let player; // Bob 
 let canvasW = 1300; // canvas Width
@@ -37,23 +37,13 @@ function draw() {
     startingScreen();
     return;
   }  
-player.handleDeath();
+
+//player Physics
+player.body();
 player.gravity();
-player.collisions();
+player.handleDeath();
 
-
-if(player.dead){
-  player.deadBody();
-
-}else{
-  player.body();
-  player.movement();
-  player.wallCollision();
-  player.levelChanging();
-  player.spikesCollision();
-  player.enemyCollision();
-  }
-
+//World physics
 
 
 
@@ -71,6 +61,16 @@ if(player.dead){
     e.display();
     e.move();
   }
+
+ player.collisions();
+ if(player.dead !== true){
+ player.movement();
+ player.levelChanging();
+ player.spikesCollision();
+ player.enemyCollision();
+}
+player.wallCollision();
+
 
   // Player physics (Collision, movement)
 
@@ -183,7 +183,67 @@ if(level === 4){
   //wall out of the canvas
   plat.push(new platform(canvasW + 10,canvasH,4,4999,0,0));
 }
+if(level === 5){
+  //Wall around the map
+  plat.push(new platform(1270,-10,40,500,0,0));
+  //Spikes on the wall 
+  for(let i = 30; i < 470; i += 30){ // It is spaced 30 for each spike
+    spike.push(new spikes(1270,i,1250,i + 30/2,1270, i+30));
+  }
+  //starting platform
+  plat.push(new platform(-10,490,220,40,0,0));
+  //U shaped platform
+  plat.push(new platform(400,355,348,45,0,0));
+  plat.push(new platform(380,180,50,220,0,0));
+  plat.push(new platform(698,180,50,220,0,0));
+  for(let i = 435; i < 675; i += 25){ // It is spaced 30 for each spike
+    spike.push(new spikes(i,355,i + 30/2,335,i + 30, 355));
+  }
+  // platform after the u shaped platform
+  plat.push(new platform(980,280,90,40,0,0));
+  // moving platform under the above one
+  plat.push(new platform(980,540,60,40,1,1200));
+}
+if(level === 6){
+  // 1. STARTING HUB
+  // A solid block to start on
+  plat.push(new platform(-10, 400, 150, 300, 0, 0));
 
+  // 2. THE TOP "PRESS" (Ceiling Danger)
+  // A long ceiling with spikes to prevent high jumping
+  plat.push(new platform(150, -10, 900, 110, 0, 0));
+  for(let i = 150; i < 1050; i += 30){
+    spike.push(new spikes(i, 100, i + 15, 130, i + 30, 100));
+  }
+
+  // 3. THE "JUMPING STAIRS"
+  // Small, precise platforms that lead upward
+  plat.push(new platform(250, 450, 50, 20, 0, 0));
+  plat.push(new platform(400, 350, 50, 20, 0, 0));
+  plat.push(new platform(550, 250, 50, 20, 0, 0));
+
+  // 4. THE LONG DROP PIT (Spikes on ground)
+  // If you fall off the stairs, you land here.
+  for(let i = 150; i < 800; i += 30){
+    spike.push(new spikes(i, 670, i + 15, 640, i + 30, 670));
+  }
+
+  // 5. THE MOVING BRIDGE
+  // This platform moves very fast back and forth. 
+  // You must land on it from the top stair to cross the second pit.
+  plat.push(new platform(650, 250, 100, 30, 2, 1100));
+
+  // 6. THE ENEMY GAUNTLET (Bottom Right)
+  // Once you cross the bridge, you land on this large floor.
+  plat.push(new platform(1000, 500, 300, 200, 0, 0));
+  
+  // Two enemies walking in sync to create a "gap" you have to run through
+  enemy.push(new enemies(1000, 460, 3, 1250));
+
+  // 7. THE FINAL WALL JUMP
+  // A tall wall right at the exit that requires a wall jump to clear
+  plat.push(new platform(1250, 150, 50, 370, 0, 0));
+}
 }
 
 class Bob{
@@ -208,21 +268,26 @@ class Bob{
     this.dead = false; // death state
   }
 
-  //-------------------------BOB'S DESIGN-----------------------------------
+//-------------------------BOB'S DESIGN-----------------------------------
   
   body(){
     noStroke();
     //Body   
     fill("white");
+if(this.dead){   // if Bob is dead
+      this.size = 8;
+      square(this.x,this.y,this.size,2);
+      square(this.x + 15,this.y,this.size,2);
+      square(this.x + 30,this.y,this.size,2);
+    }
+    else{
+    this.size = 40;
     square(this.x,this.y,this.size,5);
     //Eyes
     fill("black");
     square(this.x + 8, this.y + 9,8,2);
     square(this.x + 24, this.y + 9,8,2);
-    // If Bob is goes out of the ground throught the hole
-    // Checks if Bob goes out
-    
-    
+  }   
 }
 
 handleDeath(){
@@ -243,11 +308,6 @@ handleDeath(){
     }
 }
 
-deadBody(){
-  noStroke()
-  fill("white")
-  square(this.x,this.y,5,2);
-}
 // -----------------------------MOVEMENT----------------------------
   
   movement(){
@@ -386,10 +446,8 @@ spikesCollision(){
       this.y + this.size > s.y2 && // Bob is on the spikes
       this.y < s.y1 // Bob falling on the spikes
     ){
-      this.x = 20; // reset the player's x position
-      this.y = 222; // reset the player's y position
-      this.vx = 0;
-      this.vy = 0;
+      this.timeToRevive = 70;
+      this.dead = true;
     }
   } 
     // if spikes are on the ceiling
@@ -398,14 +456,12 @@ spikesCollision(){
         this.x + this.size > s.x1 && 
         this.x < s.x3 &&
         this.y < s.y2 &&
-        this.y <= s.y1){
-          this.x = 20; // reset the player's x position
-          this.y = 222; // reset the player's y position
-          this.vx = 0;
-          this.vy = 0;
+        this.y >= s.y1){
+          this.timeToRevive = 70;
+          this.dead = true;
       }
     }
-    // for side ways spikes pointing to the right
+    // for side ways spikes pointing to the right/left
     else if(s.y1 < s.y2 && s.x1 === s.x3){
       if(
         this.y + this.size > s.y1 && 
@@ -413,10 +469,8 @@ spikesCollision(){
         this.x + this.size > s.x1 &&
         this.x < s.x2
       ){
-        this.x = 20;
-        this.y = 222;
-        this.vx = 0;
-        this.vy = 0;
+        this.timeToRevive = 70;
+        this.dead = true;
       }
     }
   }
