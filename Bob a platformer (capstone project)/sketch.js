@@ -9,7 +9,7 @@
 // - Level using system using classes and objects
 
 // Global Variables
-let level = 0; // stages of the game 
+let level = 7; // stages of the game 
 let plat; // for platforms
 let player; // Bob 
 let canvasW = 1300; // canvas Width
@@ -36,22 +36,21 @@ function draw() {
   if(level === 0){
     startingScreen();
     return;
-  }  
+  }
 
 //player Physics
-player.body();
 player.gravity();
+player.collisions();
+
+player.body();
 player.handleDeath();
 
-//World physics
-
-
-
-  //generates platforms
+//generates platforms
   for(let p of plat){
     p.movingPlats();
     p.create();
-  }
+  }   
+
   // Generates spikes
   for(let s of spike){
     s.display()
@@ -62,7 +61,6 @@ player.handleDeath();
     e.move();
   }
 
- player.collisions();
  if(player.dead !== true){
  player.movement();
  player.levelChanging();
@@ -70,9 +68,6 @@ player.handleDeath();
  player.enemyCollision();
 }
 player.wallCollision();
-
-
-  // Player physics (Collision, movement)
 
   //--TOOL FOR PLACING PLATFORMS IN THE RIGHT PLACE--
   fill("white");
@@ -203,47 +198,62 @@ if(level === 5){
   plat.push(new platform(980,280,90,40,0,0));
   // moving platform under the above one
   plat.push(new platform(980,540,60,40,1,1200));
+  //exit platform
+  plat.push(new platform(1230,570,40,70,0,0));
 }
 if(level === 6){
-  // 1. STARTING HUB
   // A solid block to start on
   plat.push(new platform(-10, 400, 150, 300, 0, 0));
-
-  // 2. THE TOP "PRESS" (Ceiling Danger)
   // A long ceiling with spikes to prevent high jumping
   plat.push(new platform(150, -10, 900, 110, 0, 0));
   for(let i = 150; i < 1050; i += 30){
     spike.push(new spikes(i, 100, i + 15, 130, i + 30, 100));
   }
-
-  // 3. THE "JUMPING STAIRS"
   // Small, precise platforms that lead upward
   plat.push(new platform(250, 450, 50, 20, 0, 0));
   plat.push(new platform(400, 350, 50, 20, 0, 0));
   plat.push(new platform(550, 250, 50, 20, 0, 0));
-
-  // 4. THE LONG DROP PIT (Spikes on ground)
   // If you fall off the stairs, you land here.
   for(let i = 150; i < 800; i += 30){
     spike.push(new spikes(i, 670, i + 15, 640, i + 30, 670));
   }
-
-  // 5. THE MOVING BRIDGE
   // This platform moves very fast back and forth. 
   // You must land on it from the top stair to cross the second pit.
   plat.push(new platform(650, 250, 100, 30, 2, 1100));
-
-  // 6. THE ENEMY GAUNTLET (Bottom Right)
   // Once you cross the bridge, you land on this large floor.
   plat.push(new platform(1000, 500, 300, 200, 0, 0));
-  
   // Two enemies walking in sync to create a "gap" you have to run through
   enemy.push(new enemies(1000, 460, 3, 1250));
-
-  // 7. THE FINAL WALL JUMP
   // A tall wall right at the exit that requires a wall jump to clear
   plat.push(new platform(1250, 150, 50, 370, 0, 0));
 }
+if(level === 7){
+  //wall around the map
+  plat.push(new platform(1250,-100,80,600,0,0));
+  plat.push(new platform(-10,-10,1400,60,0,0));
+  for(let i = 0; i < 1220; i+= 30){
+    spike.push(new spikes(i,50,i + 15,70,i + 30,50));
+  }
+  for(let i = 50; i < 470; i += 30){ // It is spaced 30 for each spike
+    spike.push(new spikes(1250,i,1230,i + 15,1250, i + 30));
+  }
+  //starting platform
+  plat.push(new platform(-10,295,110,305,0,0));
+  //stairs going down
+  plat.push(new platform(275,245,60,20,0,0));
+  plat.push(new platform(450,330,60,20,0,0));
+  //Spikes arena after the stairs
+  plat.push(new platform(570,460,130,40,0,0));
+  for(let i = 575; i < 690; i += 30){
+    spike.push(new spikes(i, 460, i + 15, 440, i + 30, 460));
+  }
+  //moving platform after the spikes area
+  plat.push(new platform(740,460,100,40,3,950));
+  //exit platform
+  plat.push(new platform(1050,550,265,40,0,0));
+  enemy.push(new enemies(1060,510,2,canvasW));
+}
+
 }
 
 class Bob{
@@ -394,10 +404,11 @@ handleDeath(){
           this.y = p.yp - this.size; //Places bob on the platformer
           this.vy = 0;
           this.onGround = true;
-          if(p.vx !== 0){
+          if(p.vx !== 0){ // makes bob move along with the platform
           this.x += p.vx;
-          }
         }
+        }
+        
         
         // if hitting the ceiling
         if(
@@ -577,6 +588,7 @@ class enemies{
     this.vx = vx;
     this.rg = r; // range in which the enemy/obstacle can travel
   }
+  
   display(){
     noStroke();
     //Body   
@@ -589,18 +601,15 @@ class enemies{
   }
   move(){
     this.xe += this.vx;
-    
     // moving left
       if(this.xe + this.eSize >= this.rg){
       this.xe = this.rg - this.eSize;
       this.vx *= -1;
-
     }
     //moving right
     else if(this.xe <= this.xStart){
       this.xe = this.xStart;
       this.vx *= -1;
     }  
-
   }
 }
