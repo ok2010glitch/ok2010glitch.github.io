@@ -9,7 +9,7 @@
 // - Level using system using classes and objects
 
 // Global Variables
-let level = 7; // stages of the game 
+let level = 0; // stages of the game 
 let plat; // for platforms
 let player; // Bob 
 let canvasW = 1300; // canvas Width
@@ -17,18 +17,75 @@ let canvasH = 670; // canvas Height
 let spike;
 let enemy;
 
+//menu page elements
+let playImg;
+let menu;
+let moon;
+
 function setup() {
   createCanvas(canvasW,canvasH);
   player = new Bob(20 , 220); 
   levels(); 
 }
 
-function startingScreen(){
-  fill("white");
-  textSize(60);
-  textAlign(CENTER);
-  text("Press Space",canvasW/2,canvasH/2);
+function preload(){
+  playImg = loadImage("Assets/play.png");
+  menu = loadImage("Assets/menu.png");
+  moon = loadImage("Assets/moonGU.png");
+}
 
+function startingScreen(){
+  let bx = canvasW/2;
+  let by = canvasH/2;
+  let bw = 200;
+  let bh = 200;
+
+  // mouse placement
+  let hovering =
+  mouseX > bx - bw/2 &&
+  mouseX < bx + bw/2 &&
+  mouseY > by - bh/2 &&
+  mouseY < by + bh/2
+  
+  imageMode(CENTER);
+// for hovering effect
+  if(hovering){
+    tint(255,100);
+    image(playImg,bx,by,bw + 20, bh + 20);
+  }
+  else{
+    noTint();
+    image(playImg,bx,by,bw,bh);
+  }
+  noTint();
+  image(menu,canvasW/2,canvasH/2 - 200,850,380);
+  fill("white");
+  square(50, 100, 200,20);
+  fill("black");
+  square(90, 160,40,10);
+  square(160, 160,40,10);
+  //moon in the background
+  fill("grey");
+  image(moon,canvasW/2 + 550,canvasH/2 - 100, 750,600);
+
+}
+
+function mousePressed(){
+  if(level !== 0) return;
+  let bx = canvasW/2;
+  let by = canvasH/2
+  let bw = 200;
+  let bh = 200;
+
+  if(
+  mouseX > bx - bw/2 &&
+  mouseX < bx + bw/2 &&
+  mouseY > by - bh/2 &&
+  mouseY < by + bh/2
+  ){
+    level = 1;
+    levels();
+}
 }
 
 function draw() {
@@ -37,7 +94,7 @@ function draw() {
     startingScreen();
     return;
   }
-
+  
 //player Physics
 player.gravity();
 player.collisions();
@@ -76,13 +133,6 @@ player.wallCollision();
   let roundedY = round(mouseY);
   text("x: " + roundedX + " y: " + roundedY, mouseX + 20, mouseY);
   //----------------//
-}
-
-function keyPressed(){
-  if(level === 0 && keyCode === 32){
-    level = 1;
-    levels();
-  }
 }
 
 function levels(){
@@ -253,7 +303,6 @@ if(level === 7){
   plat.push(new platform(1050,550,265,40,0,0));
   enemy.push(new enemies(1060,510,2,canvasW));
 }
-
 }
 
 class Bob{
