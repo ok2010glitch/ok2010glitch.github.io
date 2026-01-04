@@ -9,11 +9,13 @@
 // - Level using system using classes and objects
 
 // Global Variables
-let level = 0; // stages of the game 
-let plat; // for platforms
-let player; // Bob 
+let level = 8; // stages of the game  
 let canvasW = 1300; // canvas Width
 let canvasH = 670; // canvas Height
+
+// Generation of platform componenet
+let plat; // for platforms
+let player; // Bob
 let spike;
 let enemy;
 
@@ -22,12 +24,16 @@ let playImg;
 let menu;
 let moon;
 
+// For one time movement one platform
+let movingOne = false;
+
 function setup() {
   createCanvas(canvasW,canvasH);
   player = new Bob(20 , 220); 
   levels(); 
 }
 
+//loads images
 function preload(){
   playImg = loadImage("Assets/play.png");
   menu = loadImage("Assets/menu.png");
@@ -35,8 +41,8 @@ function preload(){
 }
 
 function startingScreen(){
-  let bx = canvasW/2;
-  let by = canvasH/2;
+  let bx = canvasW/2; // position for x axis
+  let by = canvasH/2; // position for y axis
   let bw = 200;
   let bh = 200;
 
@@ -94,7 +100,9 @@ function draw() {
     startingScreen();
     return;
   }
-  
+
+
+
 //player Physics
 player.gravity();
 player.collisions();
@@ -107,6 +115,7 @@ player.handleDeath();
     p.movingPlats();
     p.create();
   }   
+  dieAgain();  
 
   // Generates spikes
   for(let s of spike){
@@ -118,12 +127,13 @@ player.handleDeath();
     e.move();
   }
 
- if(player.dead !== true){
+if(player.dead !== true){
  player.movement();
  player.levelChanging();
  player.spikesCollision();
  player.enemyCollision();
 }
+
 player.wallCollision();
 
   //--TOOL FOR PLACING PLATFORMS IN THE RIGHT PLACE--
@@ -135,25 +145,35 @@ player.wallCollision();
   //----------------//
 }
 
+function dieAgain(){
+  for(let p of plat){
+    if(!player.dead && p.rangeP > 0){
+      if(player.x + player.size > p.xp - p.rangeP){
+        movingOne = true;
+      }
+    }
+  }
+}
+
 function levels(){
   plat = [];
   spike = [];
   enemy = [];
   if(level === 1){
-  plat.push(new platform(0,515,550,canvasH-515,0,0));
-  plat.push(new platform(830,515,canvasW,canvasH-515,0,0));
+  plat.push(new platform(0,515,550,canvasH-515,0,0,0));
+  plat.push(new platform(830,515,canvasW,canvasH-515,0,0,0));
   //platform between the hole
-  plat.push(new platform(610,390,100,40,0,0));
+  plat.push(new platform(610,390,100,40,0,0,0));
   //Ceiling
-  plat.push(new platform(0,-10,410,210,0));
+  plat.push(new platform(0,-10,410,210,0,0));
   //Ceiling
-  plat.push(new platform(0,-10,410,200,0,canvasW));
+  plat.push(new platform(0,-10,410,200,0,canvasW,0));
   // Wall at the end of the canvas
-  plat.push(new platform(1200, 148, canvasW - 1200, canvasH,0,0));
+  plat.push(new platform(1200, 148, canvasW - 1200, canvasH,0,0,0));
   //Extension for wall at the end
-  plat.push(new platform(1078, 148, 140, 50,0,0));
+  plat.push(new platform(1078, 148, 140, 50,0,0,0));
   // A platform after the platform bewtween the hole
-  plat.push(new platform(840,260,90,40,0,0));
+  plat.push(new platform(840,260,90,40,0,0,0));
   // For having mulitple spikes in one row
   for(let i = 900; i < 1100; i += 30){ // It is spaced 30 for each spike
     spike.push(new spikes(i,515,i + 30/2,495,i + 30, 515));
@@ -161,42 +181,42 @@ function levels(){
 }
  if(level === 2){
   //Ceiling
-  plat.push(new platform(290,90,110,170,0,0));
-  plat.push(new platform(0,-10,400,110,0,0));
-  plat.push(new platform(1180,135,canvasW - 1180, canvasH,0,0));
-  plat.push(new platform(390,-10,325,25,0,0));
+  plat.push(new platform(290,90,110,170,0,0,0));
+  plat.push(new platform(0,-10,400,110,0,0,0));
+  plat.push(new platform(1180,135,canvasW - 1180, canvasH,0,0,0));
+  plat.push(new platform(390,-10,325,25,0,0,0));
   //spikes on the ceiling
    for(let i = 410; i < 700; i += 30){ // It is spaced 30 for each spike
     spike.push(new spikes(i,15,i + 30/2,35,i + 30, 15));
   }
   // starting platform
-  plat.push(new platform(0,515,200,40,0,0));
+  plat.push(new platform(0,515,200,40,0,0,0));
   //moving platforms
-  plat.push(new platform(320,390,200,40,2,850)); 
-  plat.push(new platform(540,120,110,40,1,750));
+  plat.push(new platform(320,390,200,40,2,850,0,0)); 
+  plat.push(new platform(540,120,110,40,1,750,0));
   // platform after the above moving platform
-  plat.push(new platform(920,114,canvasW,40,0,0));
+  plat.push(new platform(920,114,canvasW,40,0,0,0));
 }
 if(level === 3){
   //starting Platform
-  plat.push(new platform(-10,540,220,40,0,0));
+  plat.push(new platform(-10,540,220,40,0,0,0));
   //Wall under the ceiling
-  plat.push(new platform(280,180,80,200,0,0));
+  plat.push(new platform(280,180,80,200,0,0,0));
   //Ceiling
-  plat.push(new platform(-10,-10,500,200,0,0));
+  plat.push(new platform(-10,-10,500,200,0,0,0));
   //moving platform after the starting platform
-  plat.push(new platform(360,460,60,40,1,600));
+  plat.push(new platform(360,460,60,40,1,600,0));
   // over the moving platform
-  plat.push(new platform(480,290,80,40,0,0));
+  plat.push(new platform(480,290,80,40,0,0,0));
   // Another moving platform
-  plat.push(new platform(745,240,100,40,1.2,900));
+  plat.push(new platform(745,240,100,40,1.2,900,0));
   //spikes on the cieling
   for(let i = 360; i < 480; i += 30){ // It is spaced 30 for each spike
     spike.push(new spikes(i,190,i + 30/2,210,i + 30, 190));
   }
   //ceiling on the far right handside
-  plat.push(new platform(1170,175,200,200,0,0));
-  plat.push(new platform(1120,-15,canvasW,200,0,0));
+  plat.push(new platform(1170,175,200,200,0,0,0));
+  plat.push(new platform(1120,-15,canvasW,200,0,0,0));
   // the platform at the end where bob advances (moving platform)
   plat.push(new platform(1110,480,70,40,1,1280));
   //wall outside of the canvas
@@ -205,13 +225,13 @@ if(level === 3){
 }
 if(level === 4){
   // starting platform
-  plat.push(new platform(-10,490,220,40,0,0));
+  plat.push(new platform(-10,490,220,40,0,0,0));
   // platform after the starting platform standing on the air
-  plat.push(new platform(330,230,50,150,0,0));
+  plat.push(new platform(330,230,50,150,0,0,0));
   // L-shaped platform after the platform in the air
-  plat.push(new platform(820,170,40,200,0,0));
-  plat.push(new platform(540,170,300,50,0,0));
-  plat.push(new platform(540,90,40,100,0,0));
+  plat.push(new platform(820,170,40,200,0,0,0));
+  plat.push(new platform(540,170,300,50,0,0,0));
+  plat.push(new platform(540,90,40,100,0,0,0));
   //spikes on the L-shaped platform
   for(let i = 180; i < 320; i += 30){ // It is spaced 30 for each spike
     spike.push(new spikes(860,i,880,i + 30/2,860, i+30));
@@ -219,68 +239,66 @@ if(level === 4){
   // red minion
   enemy.push(new enemies(600,130,2,790));
   //moving platform
-  plat.push(new platform(1080,150,60,40,1,1220));
+  plat.push(new platform(1080,150,60,40,1,1220,0));
   //wall L-shaped after the moving platform
-  plat.push(new platform(930,-15,500,30,0,0));
-  plat.push(new platform(canvasW-20,-10,20,canvasH-100,0,0));
+  plat.push(new platform(930,-15,500,30,0,0,0));
+  plat.push(new platform(canvasW-20,-10,20,canvasH-100,0,0,0));
 
-  plat.push(new platform(1230,canvasH-60,160,40,0,0));
+  plat.push(new platform(1230,canvasH-60,160,40,0,0,0));
   //wall out of the canvas
-  plat.push(new platform(canvasW + 10,canvasH,4,4999,0,0));
+  plat.push(new platform(canvasW + 10,canvasH,4,4999,0,0,0));
 }
 if(level === 5){
   //Wall around the map
-  plat.push(new platform(1270,-10,40,500,0,0));
+  plat.push(new platform(1270,-10,40,500,0,0,0));
   //Spikes on the wall 
   for(let i = 30; i < 470; i += 30){ // It is spaced 30 for each spike
     spike.push(new spikes(1270,i,1250,i + 30/2,1270, i+30));
   }
   //starting platform
-  plat.push(new platform(-10,490,220,40,0,0));
+  plat.push(new platform(-10,490,220,40,0,0,0));
   //U shaped platform
-  plat.push(new platform(400,355,348,45,0,0));
-  plat.push(new platform(380,180,50,220,0,0));
-  plat.push(new platform(698,180,50,220,0,0));
+  plat.push(new platform(400,355,348,45,0,0,0));
+  plat.push(new platform(380,180,50,220,0,0,0));
+  plat.push(new platform(698,180,50,220,0,0,0));
   for(let i = 435; i < 675; i += 25){ // It is spaced 30 for each spike
     spike.push(new spikes(i,355,i + 30/2,335,i + 30, 355));
   }
   // platform after the u shaped platform
-  plat.push(new platform(980,280,90,40,0,0));
-  // moving platform under the above one
-  plat.push(new platform(980,540,60,40,1,1200));
+  plat.push(new platform(980,280,90,40,0,0,0));
   //exit platform
-  plat.push(new platform(1230,570,40,70,0,0));
+  plat.push(new platform(1230,570,40,120,0,0,0));
 }
 if(level === 6){
   // A solid block to start on
-  plat.push(new platform(-10, 400, 150, 300, 0, 0));
+  plat.push(new platform(-10, 400, 150, 300, 0, 0,0));
   // A long ceiling with spikes to prevent high jumping
-  plat.push(new platform(150, -10, 900, 110, 0, 0));
+  plat.push(new platform(150, -10, 900, 110, 0, 0,0));
   for(let i = 150; i < 1050; i += 30){
     spike.push(new spikes(i, 100, i + 15, 130, i + 30, 100));
   }
   // Small, precise platforms that lead upward
-  plat.push(new platform(250, 450, 50, 20, 0, 0));
-  plat.push(new platform(400, 350, 50, 20, 0, 0));
-  plat.push(new platform(550, 250, 50, 20, 0, 0));
+  plat.push(new platform(250, 450, 50, 20, 0, 0,0));
+  plat.push(new platform(400, 350, 50, 20, 0, 0,0));
+  plat.push(new platform(550, 250, 50, 20, 0, 0,0));
   // If you fall off the stairs, you land here.
   for(let i = 150; i < 800; i += 30){
     spike.push(new spikes(i, 670, i + 15, 640, i + 30, 670));
   }
   // This platform moves very fast back and forth. 
   // You must land on it from the top stair to cross the second pit.
-  plat.push(new platform(650, 250, 100, 30, 2, 1100));
+  plat.push(new platform(650, 250, 100, 30, 2, 1100,0));
   // Once you cross the bridge, you land on this large floor.
-  plat.push(new platform(1000, 500, 300, 200, 0, 0));
+  plat.push(new platform(1000, 500, 300, 200, 0, 0,0));
   // Two enemies walking in sync to create a "gap" you have to run through
   enemy.push(new enemies(1000, 460, 3, 1250));
   // A tall wall right at the exit that requires a wall jump to clear
-  plat.push(new platform(1250, 150, 50, 370, 0, 0));
+  plat.push(new platform(1250, 150, 50, 370, 0, 0,0));
 }
 if(level === 7){
   //wall around the map
-  plat.push(new platform(1250,-100,80,600,0,0));
-  plat.push(new platform(-10,-10,1400,60,0,0));
+  plat.push(new platform(1250,-100,80,600,0,0,0));
+  plat.push(new platform(-10,-10,1400,60,0,0,0));
   for(let i = 0; i < 1220; i+= 30){
     spike.push(new spikes(i,50,i + 15,70,i + 30,50));
   }
@@ -288,20 +306,25 @@ if(level === 7){
     spike.push(new spikes(1250,i,1230,i + 15,1250, i + 30));
   }
   //starting platform
-  plat.push(new platform(-10,295,110,305,0,0));
+  plat.push(new platform(-10,295,110,305,0,0,0));
   //stairs going down
-  plat.push(new platform(275,245,60,20,0,0));
-  plat.push(new platform(450,330,60,20,0,0));
+  plat.push(new platform(275,245,60,20,0,0,0));
+  plat.push(new platform(450,330,60,20,0,0,0));
   //Spikes arena after the stairs
-  plat.push(new platform(570,460,130,40,0,0));
+  plat.push(new platform(570,460,130,40,0,0,0));
   for(let i = 575; i < 690; i += 30){
     spike.push(new spikes(i, 460, i + 15, 440, i + 30, 460));
   }
   //moving platform after the spikes area
-  plat.push(new platform(740,460,100,40,3,950));
+  plat.push(new platform(740,460,100,40,3,950,0));
   //exit platform
-  plat.push(new platform(1050,550,265,40,0,0));
+  plat.push(new platform(1050,550,265,40,0,0,0));
   enemy.push(new enemies(1060,510,2,canvasW));
+}
+if(level === 8){
+  plat.push(new platform(-10,540,660,400,0,0,0));
+  //Moves when player get closer to it(inspiration die again)
+  plat.push(new platform(645,540,80,400,0,0,200,20));
 }
 }
 
@@ -363,6 +386,12 @@ handleDeath(){
         this.y = 220;
         this.vx = 0;
         this.vy = 0;
+        movingOne = false;
+    for(let p of plat){
+      if(p.pc !== 0){
+        p.reset();
+      }
+    }
       }
     }
 }
@@ -388,8 +417,7 @@ handleDeath(){
       this.vx = 0;
     }
   }
-      
-    }
+}
     
     //Jumping logic
     if(keyIsDown(UP_ARROW)){
@@ -569,7 +597,7 @@ levelChanging(){
 //-----------------------------------------PLATFORM-------------------------------------------
 
 class platform{
-  constructor(x,y,w,h,vx,range){
+  constructor(x,y,w,h,vx,range,pc,rp){
     this.xStart = x; // for moving platforms
     this.xp = x;
     this.yp = y;
@@ -577,23 +605,26 @@ class platform{
     this.h = h; // height of the platform
     this.vx = vx; // velocity x
     this.r = range; // range in which the platform can travel
+    this.pc = pc // placement movement for one time movement (inspirtation DIE AGAIN);
+    this.pcApplied = false;
+    this.rangeP = rp // range of player within the platform will move if >= then move
+    this.decRate = 0.8; 
   }
 
   create(){
     let toppingHieght = 10;
     fill(136, 137, 138);
     rect(this.xp,this.yp,this.w,this.h,5);
+    //ground on top
     fill(211, 211, 211);
     rect(this.xp,this.yp ,this.w, toppingHieght,5);
   }
 
   // moving platform back and forth
   movingPlats(){
-    this.xp += this.vx;
 
-    if(this.vx === 0){ // if no speed then do nothing
-      return;
-    }  
+    if(this.vx !== 0){ // if no speed then do nothing
+    this.xp += this.vx;
     // moving left
       if(this.xp + this.w >= this.r){
       this.xp = this.r - this.w;
@@ -604,8 +635,19 @@ class platform{
     else if(this.xp <= this.xStart){
       this.xp = this.xStart;
       this.vx = -this.vx;
-    }  
+    }
   }
+  if(this.pc !== 0 && movingOne && !this.pcApplied){
+      this.xp += this.pc;
+      this.pcApplied = true;
+    }
+     
+  }
+reset(){
+  this.xp = this.xStart;
+  this.pcApplied = false;
+}
+
 }
 
 //--------------------------------------------SPIKES----------------------------------------------
@@ -648,6 +690,7 @@ class enemies{
     square(this.xe + 8, this.ye + 9,8,2);
     square(this.xe + 24, this.ye + 9,8,2);
   }
+  
   move(){
     this.xe += this.vx;
     // moving left
@@ -662,3 +705,9 @@ class enemies{
     }  
   }
 }
+
+
+
+
+
+
