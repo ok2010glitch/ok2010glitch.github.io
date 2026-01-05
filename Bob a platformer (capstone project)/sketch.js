@@ -23,6 +23,7 @@ let enemy;
 let playImg;
 let menu;
 let moon;
+let textF;
 
 // For one time movement one platform
 let movingOne = false;
@@ -36,13 +37,14 @@ function setup() {
 //loads images
 function preload(){
   playImg = loadImage("Assets/play.png");
+  textF = loadFont("Assets/BabelStoneModern.ttf");
 }
 
 function startingScreen(){
   let bx = canvasW/2; // position for x axis
   let by = canvasH/2; // position for y axis
-  let bw = 200;
-  let bh = 200;
+  let bw = 250;
+  let bh = 250;
 
   // mouse placement
   let hovering =
@@ -55,12 +57,50 @@ function startingScreen(){
 // for hovering effect
   if(hovering){
     tint(255,100);
-    image(playImg,bx,by,bw + 20, bh + 20);
+    image(playImg,bx,by - 10,bw + 20, bh + 20);
   }
   else{
     noTint();
-    image(playImg,bx,by,bw,bh);
+    image(playImg,bx,by - 10,bw,bh);
   }
+  let x = 50;
+  let y = 100;
+  textFont(textF);
+  textAlign(CENTER);
+  textSize(58);
+  text("BOB A PLATFORMER",bx,by - 200);
+  
+  let sSz = 10;          // Scale Factor (10x bigger)
+  let menuSize = 40 * sSz; // Final size: 400px
+  let menuX = 50;        // X position on menu
+  let menuY = 250;       // Y position on menu
+  
+  noStroke();
+
+  // ===== BODY =====
+  fill(185, 150, 105); // sand body
+  square(menuX, menuY, menuSize, 6 * sSz);
+
+  // ===== HEAD SCARF (turban) =====
+  fill(180, 140, 90);
+  // Main wrap
+  rect(menuX, menuY - (6 * sSz), menuSize, 10 * sSz, 6 * sSz);
+  // Top fold
+  rect(menuX + (4 * sSz), menuY - (10 * sSz), 32 * sSz, 10 * sSz, 6 * sSz);
+
+  // ===== GOGGLES =====
+  fill(60);
+  // Left frame
+  rect(menuX + (6 * sSz), menuY + (10 * sSz), 12 * sSz, 8 * sSz, 3 * sSz);
+  // Right frame
+  rect(menuX + (22 * sSz), menuY + (10 * sSz), 12 * sSz, 8 * sSz, 3 * sSz);
+
+  // Goggles glass
+  fill(100, 180, 200);
+  // Left lens
+  rect(menuX + (8 * sSz), menuY + (12 * sSz), 8 * sSz, 4 * sSz, 2 * sSz);
+  // Right lens
+  rect(menuX + (24 * sSz), menuY + (12 * sSz), 8 * sSz, 4 * sSz, 2 * sSz);
 
 
 }
@@ -91,7 +131,6 @@ function draw() {
   }
 
 
-
 //player Physics
 player.gravity();
 player.collisions();
@@ -103,7 +142,8 @@ player.handleDeath();
   for(let p of plat){
     p.movingPlats();
     p.create();
-  }   
+  }
+
   dieAgain();  
 
   // Generates spikes
@@ -134,6 +174,7 @@ player.wallCollision();
   //----------------//
 }
 
+// One time moving platform
 function dieAgain(){
   for(let p of plat){
     if(!player.dead && p.rangeP > 0){
@@ -611,7 +652,7 @@ class platform{
     this.vx = vx; // velocity x
     this.r = range; // range in which the platform can travel
     this.pc = pc // placement movement for one time movement (inspirtation DIE AGAIN);
-    this.pcApplied = false;
+    this.pcTriggered = false;
     this.rangeP = rp // range of player within the platform will move if >= then move
     this.decRate = 0.8; 
   }
@@ -643,7 +684,7 @@ class platform{
 
 //2. DIE AGAIN (ONE TIME PLATFORM MOVEMENT)
 //SMOOTHING OUT EFFECT 
-  if(this.pc !== 0 && movingOne && !this.pcApplied){
+  if(this.pc !== 0 && movingOne && !this.pcTriggered){
     //point the moving platform is going
     let targetX = this.xStart + this.pc;
 
@@ -660,14 +701,14 @@ class platform{
     else{
       //snaps to final position and stops calculations
       this.xp = targetX;
-      this.pcApplied = true;
+      this.pcTriggered = true;
     }
   }
  }
 // reset the die again platform into it's original place
   reset(){
     this.xp = this.xStart;
-    this.pcApplied = false;
+    this.pcTriggered = false;
  }
 }
 
