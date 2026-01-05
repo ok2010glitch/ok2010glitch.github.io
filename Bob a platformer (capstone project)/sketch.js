@@ -9,7 +9,7 @@
 // - Level using system using classes and objects
 
 // Global Variables
-let level = 8; // stages of the game  
+let level = 0; // stages of the game  
 let canvasW = 1300; // canvas Width
 let canvasH = 670; // canvas Height
 
@@ -36,8 +36,6 @@ function setup() {
 //loads images
 function preload(){
   playImg = loadImage("Assets/play.png");
-  menu = loadImage("Assets/menu.png");
-  moon = loadImage("Assets/moonGU.png");
 }
 
 function startingScreen(){
@@ -63,16 +61,7 @@ function startingScreen(){
     noTint();
     image(playImg,bx,by,bw,bh);
   }
-  noTint();
-  image(menu,canvasW/2,canvasH/2 - 200,850,380);
-  fill("white");
-  square(50, 100, 200,20);
-  fill("black");
-  square(90, 160,40,10);
-  square(160, 160,40,10);
-  //moon in the background
-  fill("grey");
-  image(moon,canvasW/2 + 550,canvasH/2 - 100, 750,600);
+
 
 }
 
@@ -95,7 +84,7 @@ function mousePressed(){
 }
 
 function draw() {
-  background("black");
+  background(244, 197, 79);
   if(level === 0){
     startingScreen();
     return;
@@ -324,7 +313,10 @@ if(level === 7){
 if(level === 8){
   plat.push(new platform(-10,540,660,400,0,0,0));
   //Moves when player get closer to it(inspiration die again)
-  plat.push(new platform(645,540,80,400,0,0,200,20));
+  plat.push(new platform(645,540,400,400,0,0,250,0.01));
+  // platform coming after the movement of the other platform
+  
+  
 }
 }
 
@@ -346,41 +338,54 @@ class Bob{
     this.airTime = 0; // time when Bob stays in the air
     this.airMax = 20; // maximum time Bob can be in the air
     this.decRate = 0.9; //deceleration rate
-    this.timeToRevive; // for having a smooth delay after each revive
+    this.timer; // for having a smooth delay after each revive
     this.dead = false; // death state
   }
 
 //-------------------------BOB'S DESIGN-----------------------------------
   
   body(){
-    noStroke();
-    //Body   
-    fill("white");
-if(this.dead){   // if Bob is dead
-      this.size = 8;
-      square(this.x,this.y,this.size,2);
-      square(this.x + 15,this.y,this.size,2);
-      square(this.x + 30,this.y,this.size,2);
-    }
-    else{
-    this.size = 40;
-    square(this.x,this.y,this.size,5);
-    //Eyes
-    fill("black");
-    square(this.x + 8, this.y + 9,8,2);
-    square(this.x + 24, this.y + 9,8,2);
-  }   
+  noStroke();
+
+  if(this.dead){
+    // Cracked sand effect when dead
+    fill(185, 150, 105); // sand color
+    square(this.x, this.y, 12, 2);
+    square(this.x + 14, this.y, 10, 2);
+    square(this.x + 26, this.y, 8, 2);
+    return;
+  }
+
+  // ===== BODY =====
+  this.size = 40;
+  fill(185, 150, 105); // sand body
+  square(this.x, this.y, this.size, 6);
+
+  // ===== HEAD SCARF (turban) =====
+  fill(180, 140, 90);
+  rect(this.x, this.y - 6, this.size, 10, 6);
+  rect(this.x + 4, this.y - 10, 32, 10,6);
+
+  // ===== GOGGLES =====
+  fill(60);
+  rect(this.x + 6, this.y + 10, 12, 8, 3);
+  rect(this.x + 22, this.y + 10, 12, 8, 3);
+
+  // goggles glass
+  fill(100, 180, 200);
+  rect(this.x + 8, this.y + 12, 8, 4, 2);
+  rect(this.x + 24, this.y + 12, 8, 4, 2);
 }
 
 handleDeath(){
   if(!this.dead && this.y > canvasH){
       this.dead = true;
-      this.timeToRevive = 70;
+      this.timer = 70;
     }
     // reviver timer starts to count down
     if(this.dead){
-      this.timeToRevive--;
-      if(this.timeToRevive <= 0){
+      this.timer--;
+      if(this.timer <= 0){
         this.dead = false;
         this.x = 20;
         this.y = 220;
@@ -534,7 +539,7 @@ spikesCollision(){
       this.y + this.size > s.y2 && // Bob is on the spikes
       this.y < s.y1 // Bob falling on the spikes
     ){
-      this.timeToRevive = 70;
+      this.timer = 70;
       this.dead = true;
     }
   } 
@@ -545,7 +550,7 @@ spikesCollision(){
         this.x < s.x3 &&
         this.y < s.y2 &&
         this.y >= s.y1){
-          this.timeToRevive = 70;
+          this.timer = 70;
           this.dead = true;
       }
     }
@@ -557,7 +562,7 @@ spikesCollision(){
         this.x + this.size > s.x1 &&
         this.x < s.x2
       ){
-        this.timeToRevive = 70;
+        this.timer = 70;
         this.dead = true;
       }
     }
@@ -572,7 +577,7 @@ enemyCollision(){
       this.y + this.size > e.ye &&
       this.y < e.ye + e.eSize
     ){
-      this.timeToRevive = 70;
+      this.timer = 70;
       this.dead = true;
     }
   }
@@ -613,23 +618,21 @@ class platform{
 
   create(){
     let toppingHieght = 10;
-    fill(136, 137, 138);
+    fill(222, 122, 5);
     rect(this.xp,this.yp,this.w,this.h,5);
     //ground on top
-    fill(211, 211, 211);
+    fill("orange");
     rect(this.xp,this.yp ,this.w, toppingHieght,5);
   }
 
   // moving platform back and forth
   movingPlats(){
-
     if(this.vx !== 0){ // if no speed then do nothing
     this.xp += this.vx;
     // moving left
-      if(this.xp + this.w >= this.r){
+    if(this.xp + this.w >= this.r){
       this.xp = this.r - this.w;
       this.vx = -this.vx;
-
     }
     //moving right
     else if(this.xp <= this.xStart){
@@ -637,17 +640,35 @@ class platform{
       this.vx = -this.vx;
     }
   }
+
+//2. DIE AGAIN (ONE TIME PLATFORM MOVEMENT)
+//SMOOTHING OUT EFFECT 
   if(this.pc !== 0 && movingOne && !this.pcApplied){
-      this.xp += this.pc;
+    //point the moving platform is going
+    let targetX = this.xStart + this.pc;
+
+    //distance remaining to cover
+    let distanceRemainingX = targetX - this.xp;
+    
+    //using alomost the same logic as used in Bob (reducing friction)
+    //creating a smoothing effect
+    let easeAmount = distanceRemainingX * 0.5;
+
+    if(distanceRemainingX > 0.5){
+      this.xp += easeAmount
+    }
+    else{
+      //snaps to final position and stops calculations
+      this.xp = targetX;
       this.pcApplied = true;
     }
-     
   }
-reset(){
-  this.xp = this.xStart;
-  this.pcApplied = false;
-}
-
+ }
+// reset the die again platform into it's original place
+  reset(){
+    this.xp = this.xStart;
+    this.pcApplied = false;
+ }
 }
 
 //--------------------------------------------SPIKES----------------------------------------------
@@ -663,7 +684,7 @@ class spikes{
   }
   display(){
     strokeWeight(2);
-    fill(211, 211, 211);
+    fill("black");
     triangle(this.x1,this.y1,this.x2,this.y2,this.x3,this.y3);
   }
 }
