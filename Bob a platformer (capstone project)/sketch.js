@@ -63,13 +63,13 @@ function startingScreen(){
     noTint();
     image(playImg,bx,by - 10,bw,bh);
   }
-  let x = 50;
-  let y = 100;
+
   textFont(textF);
   textAlign(CENTER);
   textSize(58);
+  fill("black");
   text("BOB A PLATFORMER",bx,by - 200);
-  
+
   let sSz = 10;          // Scale Factor (10x bigger)
   let menuSize = 40 * sSz; // Final size: 400px
   let menuX = 50;        // X position on menu
@@ -102,6 +102,12 @@ function startingScreen(){
   // Right lens
   rect(menuX + (24 * sSz), menuY + (12 * sSz), 8 * sSz, 4 * sSz, 2 * sSz);
 
+  //Cactus
+  fill(200,450,91);
+  circle(1125,230,50);
+  rect(1100,230, 50,320);
+
+
 
 }
 
@@ -127,6 +133,13 @@ function draw() {
   background(244, 197, 79);
   if(level === 0){
     startingScreen();
+    //--TOOL FOR PLACING PLATFORMS IN THE RIGHT PLACE--
+  fill("white");
+  textSize(16);
+  let roundedX = round(mouseX);
+  let roundedY = round(mouseY);
+  text("x: " + roundedX + " y: " + roundedY, mouseX + 20, mouseY);
+  //----------------//
     return;
   }
 
@@ -391,12 +404,12 @@ class Bob{
   if(this.dead){
     // Cracked sand effect when dead
     fill(185, 150, 105); // sand color
-    square(this.x, this.y, 12, 2);
-    square(this.x + 14, this.y, 10, 2);
-    square(this.x + 26, this.y, 8, 2);
-    return;
+    this.size = 12
+    square(this.x, this.y, this.size, 2);
+    square(this.x + 14, this.y, this.size, 2);
+    square(this.x + 30, this.y, this.size, 2);
   }
-
+  else{
   // ===== BODY =====
   this.size = 40;
   fill(185, 150, 105); // sand body
@@ -414,8 +427,11 @@ class Bob{
 
   // goggles glass
   fill(100, 180, 200);
+  //left lens
   rect(this.x + 8, this.y + 12, 8, 4, 2);
+  //right lens
   rect(this.x + 24, this.y + 12, 8, 4, 2);
+  }
 }
 
 handleDeath(){
@@ -466,7 +482,7 @@ handleDeath(){
 }
     
     //Jumping logic
-    if(keyIsDown(UP_ARROW)){
+    if(keyIsDown(32)){
       //Right wall side
     if(this.onWall && !this.onGround){
       if(this.wallSide === 1){
@@ -553,7 +569,7 @@ wallCollision(){
   for(let w of plat){
     let vr = this.y + this.size > w.yp && this.y < w.yp+w.h;
     // right side
-    if(vr && this.x < w.xp + w.w && this.x > w.xp + w.w - 10 ){
+    if(vr && this.x < w.xp + w.w && this.x > w.xp + w.w - 5 ){
       this.x = w.xp + w.w;
       this.vx = 0;
       this.onWall = true;
