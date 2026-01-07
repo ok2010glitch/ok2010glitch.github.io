@@ -106,6 +106,11 @@ function startingScreen(){
   fill(200,450,91);
   circle(1125,230,50);
   rect(1100,230, 50,320);
+  //Left side of cactus
+  rect(1000,260,150,40);
+  rect(1000,150,40,150,20);
+  //right side of cactus
+  rect(1150,340,90,30);
 
 
 
