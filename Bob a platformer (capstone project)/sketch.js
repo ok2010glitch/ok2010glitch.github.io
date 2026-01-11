@@ -103,7 +103,7 @@ function startingScreen(){
   rect(menuX + (24 * sSz), menuY + (12 * sSz), 8 * sSz, 4 * sSz, 2 * sSz);
 
   //Cactus
-  fill(200,450,91);
+  fill("green");
   circle(1125,230,50);
   rect(1100,230, 50,320);
   //Left side of cactus
@@ -111,6 +111,7 @@ function startingScreen(){
   rect(1000,150,40,150,20);
   //right side of cactus
   rect(1150,340,90,30);
+  rect(1200,275,40,90,20);
 
 
 
