@@ -9,7 +9,7 @@
 // - Level using system using classes and objects
 
 // Global Variables
-let level = 9; // stages of the game  
+let level = 2; // stages of the game  
 let canvasW = 1300; // canvas Width
 let canvasH = 670; // canvas Height
 
@@ -391,7 +391,13 @@ if(level === 9){
   plat.push(new platform(330,320,100,40,0));
   //U-shaped platform
   plat.push(new platform(440,575,275,30,0));
+  //long sticks
   plat.push(new platform(430,455,30,150,0));
+  plat.push(new platform(700,455,30,150,0));
+  //spikes on the ground
+  for(let i = 460; i < 670; i += 30){
+    
+  }
 }
 }
 
@@ -483,6 +489,7 @@ handleDeath(){
 // -----------------------------MOVEMENT----------------------------
   
   movement(){
+
     if(this.airTime > 0){ // this is producing the smooth curve when in the air
       this.airTime --;
       this.airTime *= this.decRate; // making Bob slow down while in the air
@@ -534,7 +541,11 @@ handleDeath(){
       // this.wallJumpRemaining = 2;
     }
     }
-    this.vx *= this.decRate; // gives a sliding effect for Bob
+    if(abs(this.vx)>0.1) this.vx *= this.decRate;
+    else{
+      this.vx = 0;
+    } // gives a sliding effect for Bob
+    // this.vx = max(this.vx, 0.01);
     this.x += this.vx;
 
 }
@@ -566,7 +577,8 @@ handleDeath(){
           this.vy = 0;
           this.onGround = true;
           if(p.vx !== 0){ // makes bob move along with the platform
-          this.x += p.vx;
+          this.x += p.vx*2;
+          print("sliding" + " " + this.x+ " " +  this.vx+ " " +  p.xp+ " " +  p.vx);
         }
         }
         
