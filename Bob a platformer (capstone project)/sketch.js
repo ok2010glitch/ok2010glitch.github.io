@@ -9,7 +9,7 @@
 // - Level using system using classes and objects
 
 // Global Variables
-let level = 0; // stages of the game  
+let level = 9; // stages of the game  
 let canvasW = 1300; // canvas Width
 let canvasH = 670; // canvas Height
 
@@ -34,11 +34,13 @@ function setup() {
   levels(); 
 }
 
-//loads images
+//========================================= LOADING IMAGES ========================================
 function preload(){
   playImg = loadImage("Assets/play.png");
   textF = loadFont("Assets/BabelStoneModern.ttf");
 }
+
+//============================================= MENU PAGE ============================================
 
 function startingScreen(){
   let bx = canvasW/2; // position for x axis
@@ -77,6 +79,10 @@ function startingScreen(){
   
   noStroke();
 
+  // ==== DESERT GROUND ====
+  fill(222, 122, 5);
+  rect(0,550,canvasW,200);
+
   // ===== BODY =====
   fill(185, 150, 105); // sand body
   square(menuX, menuY, menuSize, 6 * sSz);
@@ -95,14 +101,14 @@ function startingScreen(){
   // Right frame
   rect(menuX + (22 * sSz), menuY + (10 * sSz), 12 * sSz, 8 * sSz, 3 * sSz);
 
-  // Goggles glass
+  //==== LENS ====
   fill(100, 180, 200);
   // Left lens
   rect(menuX + (8 * sSz), menuY + (12 * sSz), 8 * sSz, 4 * sSz, 2 * sSz);
   // Right lens
   rect(menuX + (24 * sSz), menuY + (12 * sSz), 8 * sSz, 4 * sSz, 2 * sSz);
 
-  //Cactus
+  // ==== CACTUS ====
   fill("green");
   circle(1125,230,50);
   rect(1100,230, 50,320);
@@ -113,8 +119,6 @@ function startingScreen(){
   rect(1150,340,90,30);
   rect(1200,275,40,90,20);
 
-
-
 }
 
 function mousePressed(){
@@ -124,6 +128,7 @@ function mousePressed(){
   let bw = 200;
   let bh = 200;
 
+// ==== PLACEMENT FOR MOUSE ====
   if(
   mouseX > bx - bw/2 &&
   mouseX < bx + bw/2 &&
@@ -373,10 +378,20 @@ if(level === 7){
 if(level === 8){
   plat.push(new platform(-10,540,660,400,0,0,0));
   //Moves when player get closer to it(inspiration die again)
-  plat.push(new platform(645,540,400,400,0,0,250,0.01));
-  // platform coming after the movement of the other platform
-  
-  
+  plat.push(new platform(645,540,400,400,0,0,230,0.01));
+  // spikes on the first platform
+  for(let i = 550; i < 630; i += 30){
+    spike.push(new spikes(i, 540, i + 15, 525, i + 30, 540));
+  }  
+}
+if(level === 9){
+  //starting platform
+  plat.push(new platform(-10,440,200,40,0));
+  //platform after the starting platform
+  plat.push(new platform(330,320,100,40,0));
+  //U-shaped platform
+  plat.push(new platform(440,575,275,30,0));
+  plat.push(new platform(430,455,30,150,0));
 }
 }
 
@@ -431,14 +446,15 @@ class Bob{
   rect(this.x + 6, this.y + 10, 12, 8, 3);
   rect(this.x + 22, this.y + 10, 12, 8, 3);
 
-  // goggles glass
+  //======LENS=====
   fill(100, 180, 200);
   //left lens
   rect(this.x + 8, this.y + 12, 8, 4, 2);
   //right lens
   rect(this.x + 24, this.y + 12, 8, 4, 2);
-  }
+ }
 }
+
 
 handleDeath(){
   if(!this.dead && this.y > canvasH){
@@ -489,7 +505,8 @@ handleDeath(){
     
     //Jumping logic
     if(keyIsDown(32)){
-      //Right wall side
+
+    //Right wall side
     if(this.onWall && !this.onGround){
       if(this.wallSide === 1){
       this.vy = this.jumpP;
@@ -516,7 +533,6 @@ handleDeath(){
       this.onWall = false;
       // this.wallJumpRemaining = 2;
     }
-    
     }
     this.vx *= this.decRate; // gives a sliding effect for Bob
     this.x += this.vx;
@@ -540,7 +556,7 @@ handleDeath(){
         this.x + this.size > p.xp &&
         this.x < p.xp + p.w 
       ){
-        // if Bob is on the ground
+        // ==== TOUCHING THE GROUND ====
         if(
           this.y + this.size > p.yp &&
           this.y + this.size < p.yp + p.h &&
@@ -555,7 +571,7 @@ handleDeath(){
         }
         
         
-        // if hitting the ceiling
+        //==== HITTING THE CEILING ====
         if(
           this.y < p.yp + p.h &&
           this.y > p.yp && this.vy < 0
@@ -680,6 +696,7 @@ class platform{
   }
 
   create(){
+    noStroke();
     let toppingHieght = 10;
     fill(222, 122, 5);
     rect(this.xp,this.yp,this.w,this.h,5);
@@ -766,10 +783,11 @@ class enemies{
   
   display(){
     noStroke();
-    //Body   
+    // ==== BODY ====  
     fill("red");
     square(this.xe,this.ye,this.eSize,5);
-    //Eyes
+    
+    // ==== EYES ====
     fill("white");
     square(this.xe + 8, this.ye + 9,8,2);
     square(this.xe + 24, this.ye + 9,8,2);
