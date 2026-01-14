@@ -9,7 +9,7 @@
 // - Level using system using classes and objects
 
 // Global Variables
-let level = 2; // stages of the game  
+let level = 9; // stages of the game  
 let canvasW = 1300; // canvas Width
 let canvasH = 670; // canvas Height
 
@@ -385,19 +385,37 @@ if(level === 8){
   }  
 }
 if(level === 9){
+  //out layer
+  plat.push(new platform(1170,120,200,240,0,0,0,0));
+  plat.push(new platform(-10,-10,canvasW+20,150,0,0,0,0));
   //starting platform
-  plat.push(new platform(-10,440,200,40,0));
+  plat.push(new platform(-10,440,200,40,0,0,0,0));
   //platform after the starting platform
-  plat.push(new platform(330,320,100,40,0));
+  plat.push(new platform(410,280,100,40,0,0,0,0));
+  //one stair
+  plat.push(new platform(260,370,50,40,0,0,0,0));
   //U-shaped platform
-  plat.push(new platform(440,575,275,30,0));
+  plat.push(new platform(430,575,275,30,0,0,0,0));
   //long sticks
-  plat.push(new platform(430,455,30,150,0));
-  plat.push(new platform(700,455,30,150,0));
+  plat.push(new platform(420,455,30,150,0,0,0,0));
+  plat.push(new platform(690,455,30,150,0,0,0,0));
   //spikes on the ground
-  for(let i = 460; i < 670; i += 30){
-    
+  for(let i = 450; i < 670; i += 30){
+    spike.push(new spikes(i,575,i+15,555,i+30,575))
   }
+  //spikes on the right
+  for(let i = 460; i < 550; i += 30){
+    spike.push(new spikes(690,i,670,i+15,690,i+30));
+  }
+  //spikes on the left
+  for(let i = 460; i < 540; i += 30){
+    spike.push(new spikes(450,i,470,i+15,450,i+30));
+  }
+  plat.push(new platform(500,280,200,40,0,0,200,1));
+  //moving platform
+  plat.push(new platform(915,410,120,40,2,1100,0,0));
+  //exit platform
+  plat.push(new platform(1160,570,160,40,0,0,0,0));
 }
 }
 
