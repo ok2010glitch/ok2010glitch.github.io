@@ -9,7 +9,7 @@
 // - Level using system using classes and objects
 
 // Global Variables
-let level = 9; // stages of the game  
+let level = 8; // stages of the game  
 let canvasW = 1300; // canvas Width
 let canvasH = 670; // canvas Height
 
@@ -25,6 +25,8 @@ let menu;
 let moon;
 let textF;
 
+let bgSound;
+
 // For one time movement one platform
 let movingOne = false;
 
@@ -32,12 +34,17 @@ function setup() {
   createCanvas(canvasW,canvasH);
   player = new Bob(20 , 220); 
   levels(); 
+  bgSound.play();
+ 
+  bgSound.loop();
+  bgSound.setVolume(0.5); // Half volume
 }
 
 //========================================= LOADING IMAGES ========================================
 function preload(){
   playImg = loadImage("Assets/play.png");
   textF = loadFont("Assets/BabelStoneModern.ttf");
+  bgSound = loadSound("Assets/Desertsound.mp3");
 }
 
 //============================================= MENU PAGE ============================================
@@ -122,6 +129,8 @@ function startingScreen(){
 }
 
 function mousePressed(){
+ 
+
   if(level !== 0) return;
   let bx = canvasW/2;
   let by = canvasH/2
@@ -762,7 +771,7 @@ class platform{
     
     //using alomost the same logic as used in Bob (reducing friction)
     //creating a smoothing effect
-    let easeAmount = distanceRemainingX * 0.5;
+    let easeAmount = distanceRemainingX * 0.3;
 
     if(distanceRemainingX > 0.5){
       this.xp += easeAmount
