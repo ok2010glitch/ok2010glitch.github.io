@@ -9,7 +9,7 @@
 // - Level using system using classes and objects
 
 // Global Variables
-let level = 8; // stages of the game  
+let level = 0; // stages of the game  
 let canvasW = 1300; // canvas Width
 let canvasH = 670; // canvas Height
 
@@ -129,7 +129,7 @@ function startingScreen(){
 }
 
 function mousePressed(){
- 
+  
 
   if(level !== 0) return;
   let bx = canvasW/2;
@@ -222,6 +222,8 @@ function levels(){
   plat = [];
   spike = [];
   enemy = [];
+  movingOne = false;
+
   if(level === 1){
   plat.push(new platform(0,515,550,canvasH-515,0,0,0));
   plat.push(new platform(830,515,canvasW,canvasH-515,0,0,0));
@@ -395,7 +397,7 @@ if(level === 8){
 }
 if(level === 9){
   //out layer
-  plat.push(new platform(1170,120,200,240,0,0,0,0));
+  plat.push(new platform(1170,150,200,240,0,0,0,0));
   plat.push(new platform(-10,-10,canvasW+20,150,0,0,0,0));
   //starting platform
   plat.push(new platform(-10,440,200,40,0,0,0,0));
@@ -420,7 +422,8 @@ if(level === 9){
   for(let i = 460; i < 540; i += 30){
     spike.push(new spikes(450,i,470,i+15,450,i+30));
   }
-  plat.push(new platform(500,280,200,40,0,0,200,1));
+  //die again platform
+  plat.push(new platform(500,280,200,40,0,0,230,0.01));
   //moving platform
   plat.push(new platform(915,410,120,40,2,1100,0,0));
   //exit platform
