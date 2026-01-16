@@ -13,6 +13,9 @@ let level = 0; // stages of the game
 let canvasW = 1300; // canvas Width
 let canvasH = 670; // canvas Height
 
+// button
+let gui;
+let sliderS;
 // Generation of platform componenet
 let plat; // for platforms
 let player; // Bob
@@ -25,6 +28,7 @@ let menu;
 let moon;
 let textF;
 
+//For background music
 let bgSound;
 
 // For one time movement one platform
@@ -35,9 +39,8 @@ function setup() {
   player = new Bob(20 , 220); 
   levels(); 
   bgSound.play();
- 
-  bgSound.loop();
-  bgSound.setVolume(0.5); // Half volume
+  
+
 }
 
 //========================================= LOADING IMAGES ========================================
@@ -129,8 +132,6 @@ function startingScreen(){
 }
 
 function mousePressed(){
-  
-
   if(level !== 0) return;
   let bx = canvasW/2;
   let by = canvasH/2
@@ -152,8 +153,8 @@ function mousePressed(){
 function draw() {
   background(244, 197, 79);
   if(level === 0){
-    startingScreen();
-    //--TOOL FOR PLACING PLATFORMS IN THE RIGHT PLACE--
+  startingScreen();
+  //--TOOL FOR PLACING PLATFORMS IN THE RIGHT PLACE--
   fill("white");
   textSize(16);
   let roundedX = round(mouseX);
@@ -162,7 +163,8 @@ function draw() {
   //----------------//
     return;
   }
-
+  
+  
 
 //player Physics
 player.gravity();
