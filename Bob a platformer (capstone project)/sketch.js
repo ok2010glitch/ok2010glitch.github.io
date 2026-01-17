@@ -15,7 +15,8 @@ let canvasH = 670; // canvas Height
 
 // button
 let gui;
-let sliderS;
+let button;
+
 // Generation of platform componenet
 let plat; // for platforms
 let player; // Bob
@@ -28,6 +29,7 @@ let menu;
 let moon;
 let textF;
 
+
 //For background music
 let bgSound;
 
@@ -38,9 +40,14 @@ function setup() {
   createCanvas(canvasW,canvasH);
   player = new Bob(20 , 220); 
   levels(); 
+  gui = createGui();
+  button = createButton("CHANGE OUTFITS !", 150,540, 200,50);
+  button.setStyle({
+    fillBg : color("green"),
+    textSize : 20,
+  })
   bgSound.play();
-  
-
+  bgSound.loop();
 }
 
 //========================================= LOADING IMAGES ========================================
@@ -154,6 +161,7 @@ function draw() {
   background(244, 197, 79);
   if(level === 0){
   startingScreen();
+  drawGui();
   //--TOOL FOR PLACING PLATFORMS IN THE RIGHT PLACE--
   fill("white");
   textSize(16);
