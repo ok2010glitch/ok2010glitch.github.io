@@ -9,7 +9,7 @@
 // - Level using system using classes and objects
 
 // Global Variables
-let level = 0; // stages of the game  
+let level = 90; // stages of the game  
 let canvasW = 1300; // canvas Width
 let canvasH = 670; // canvas Height
 
@@ -36,9 +36,13 @@ let bgSound;
 // For one time movement one platform
 let movingOne = false;
 
+//Outfits
+let outFit = 1;
+
 function setup() {
   createCanvas(canvasW,canvasH);
   player = new Bob(20 , 220); 
+  angleMode(DEGREES);
   levels(); 
   gui = createGui();
   button = createButton("CHANGE OUTFITS !", 150,540, 200,50);
@@ -93,7 +97,11 @@ function startingScreen(){
   let menuSize = 40 * sSz; // Final size: 400px
   let menuX = 50;        // X position on menu
   let menuY = 250;       // Y position on menu
-  
+
+  //button for outfits switching
+  if(button.isPressed){
+    level = 1000;
+  }
   noStroke();
 
   // ==== DESERT GROUND ====
@@ -138,6 +146,102 @@ function startingScreen(){
 
 }
 
+function outFitChanging(){
+  let sSz = 5; // Scale Factor (10x bigger)
+  let menuSize = 40 * sSz; // Final size: 400px
+  let menuX = canvasW/2 - 110; // X position on menu
+  let menuY = 280; // Y position on menu
+  textAlign(CENTER);
+  textFont(textF);
+  textSize(40);
+  fill("black")
+  text("CHANGE OUTFITS!",canvasW/2,80);
+  // CHnage outfits by pressing on the keypad
+  if(keyIsDown(49)) outFit = 1;
+  if(keyIsDown(50)) outFit = 2;
+  if(keyIsDown(51)) outFit = 3;
+
+// ==================================== DESERT OUTFIT =============================================
+
+  if(outFit === 1){
+  noStroke();
+  // ===== BODY =====
+  fill(185, 150, 105); // sand body
+  square(menuX, menuY, menuSize, 6 * sSz);
+
+  // ===== HEAD SCARF (turban) =====
+  fill(180, 140, 90);
+  // Main wrap
+  rect(menuX, menuY - (6 * sSz), menuSize, 10 * sSz, 6 * sSz);
+  // Top fold
+  rect(menuX + (4 * sSz), menuY - (10 * sSz), 32 * sSz, 10 * sSz, 6 * sSz);
+
+  // ===== GOGGLES =====
+  fill(60);
+  // Left frame
+  rect(menuX + (6 * sSz), menuY + (10 * sSz), 12 * sSz, 8 * sSz, 3 * sSz);
+  // Right frame
+  rect(menuX + (22 * sSz), menuY + (10 * sSz), 12 * sSz, 8 * sSz, 3 * sSz);
+
+  //==== LENS ====
+  fill(100, 180, 200);
+  // Left lens
+  rect(menuX + (8 * sSz), menuY + (12 * sSz), 8 * sSz, 4 * sSz, 2 * sSz);
+  // Right lens
+  rect(menuX + (24 * sSz), menuY + (12 * sSz), 8 * sSz, 4 * sSz, 2 * sSz);
+}
+
+// ============================================ NOIR SPIDERMAN OUTFIT ==================================
+  if(outFit === 2){
+  // ===== BODY =====
+  fill("black"); // sand body
+  square(menuX, menuY, menuSize, 6 * sSz);
+  // ===== GOGGLES ====
+  fill(150, 75, 0);
+  // Left frame
+  square(menuX + (8 * sSz), menuY + (10 * sSz), 10 * sSz, 10);
+  // Right frame
+  square(menuX + (22 * sSz), menuY + (10 * sSz), 10 * sSz, 10);
+  rect(menuX, menuY + (13 * sSz), menuSize, 3 * sSz);
+   
+  //==== LENS ====
+  fill(100, 180, 200);
+  // Left lens
+  square(menuX + (9 * sSz), menuY + (11 * sSz), 8 * sSz, 6);
+  // Right lens
+  square(menuX + (23 * sSz), menuY + (11 * sSz), 8 * sSz, 6);
+}
+  if(outFit === 3){
+    // ==== BODY ====
+    fill(101, 67, 33);
+    square(menuX, menuY, menuSize, 6 * sSz);
+    // ==== SHERIFF HAT ====
+    fill(60, 40, 20);
+    // Brim
+    rect(menuX - (4 * sSz), menuY - (2 * sSz), menuSize + (8 * sSz), 4 * sSz, 2);
+    // Top of hat
+    rect(menuX + (6 * sSz), menuY - (12 * sSz), 28 * sSz, 12 * sSz, 4 * sSz);
+    // ==== EYES ====
+    fill("white");
+    square(menuX + (8 * sSz), menuY + (8 * sSz), 9 * sSz, 10);
+    square(menuX + (23 * sSz), menuY + (8 * sSz), 9 * sSz, 10);
+    // ==== PUPIL ====
+    fill("Black");
+    square(menuX + (10.5 * sSz), menuY + (10.5 * sSz), 4 * sSz, 1);
+    square(menuX + (25.5 * sSz), menuY + (10.5 * sSz), 4 * sSz, 1);
+    // ==== BADGE ====
+    fill(255,215,0);
+    push();
+    translate(menuX + (menuSize/ 2), menuY - (5 * sSz));
+    rotate(45);
+    rectMode(CENTER);
+    square(0,0, 6 * sSz);
+    pop();
+
+  }
+}
+
+
 function mousePressed(){
   if(level !== 0) return;
   let bx = canvasW/2;
@@ -155,6 +259,9 @@ function mousePressed(){
     level = 1;
     levels();
 }
+if(level === 0 && button.isPressed){
+  level = 90;
+}
 }
 
 function draw() {
@@ -169,6 +276,14 @@ function draw() {
   let roundedY = round(mouseY);
   text("x: " + roundedX + " y: " + roundedY, mouseX + 20, mouseY);
   //----------------//
+    return;
+  }
+  if(level === 90){
+    textSize(16);
+    let roundedX = round(mouseX);
+    let roundedY = round(mouseY);
+    text("x: " + roundedX + " y: " + roundedY, mouseX + 20, mouseY);
+    outFitChanging();
     return;
   }
   
