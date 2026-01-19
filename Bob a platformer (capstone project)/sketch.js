@@ -8,14 +8,15 @@
 // - Mulitple spike orientations (ground,ceiling,sideways)
 // - Level using system using classes and objects
 
-// Global Variables
-let level = 90; // stages of the game  
+// ============================================ GLOBAL VARIABLES ======================================
+
+let level = 0; // stages of the game  
 let canvasW = 1300; // canvas Width
 let canvasH = 670; // canvas Height
 
 // button
 let gui;
-let button;
+let homeButton;
 
 // Generation of platform componenet
 let plat; // for platforms
@@ -41,14 +42,13 @@ let outFit = 1;
 
 function setup() {
   createCanvas(canvasW,canvasH);
-  player = new Bob(20 , 220); 
+  player = new Bob(20 , 220);
+  gui = createGui(); 
   angleMode(DEGREES);
   levels(); 
-  gui = createGui();
-  button = createButton("CHANGE OUTFITS !", 150,540, 200,50);
-  button.setStyle({
-    fillBg : color("green"),
-    textSize : 20,
+  homeButton = createButton("🏠", 1250,15,30,30);
+  homeButton.setStyle({
+    textSize : 20
   })
   bgSound.play();
   bgSound.loop();
@@ -86,7 +86,6 @@ function startingScreen(){
     noTint();
     image(playImg,bx,by - 10,bw,bh);
   }
-
   textFont(textF);
   textAlign(CENTER);
   textSize(58);
@@ -97,11 +96,6 @@ function startingScreen(){
   let menuSize = 40 * sSz; // Final size: 400px
   let menuX = 50;        // X position on menu
   let menuY = 250;       // Y position on menu
-
-  //button for outfits switching
-  if(button.isPressed){
-    level = 1000;
-  }
   noStroke();
 
   // ==== DESERT GROUND ====
@@ -111,7 +105,10 @@ function startingScreen(){
   // ===== BODY =====
   fill(185, 150, 105); // sand body
   square(menuX, menuY, menuSize, 6 * sSz);
-
+  fill("black");
+  textSize(30)
+  text("CHANGE MY OUTFITS", 260, 540);
+  text("BY PRESSING O! ", 255, 600);
   // ===== HEAD SCARF (turban) =====
   fill(180, 140, 90);
   // Main wrap
@@ -146,6 +143,8 @@ function startingScreen(){
 
 }
 
+// ================================= OUTFIT CHANGING PAGE ===================================
+
 function outFitChanging(){
   let sSz = 5; // Scale Factor (10x bigger)
   let menuSize = 40 * sSz; // Final size: 400px
@@ -156,6 +155,8 @@ function outFitChanging(){
   textSize(40);
   fill("black")
   text("CHANGE OUTFITS!",canvasW/2,80);
+  textSize(25);
+  text("Use numbers to switch outfits", canvasW/2, 200)
   // CHnage outfits by pressing on the keypad
   if(keyIsDown(49)) outFit = 1;
   if(keyIsDown(50)) outFit = 2;
@@ -211,6 +212,7 @@ function outFitChanging(){
   // Right lens
   square(menuX + (23 * sSz), menuY + (11 * sSz), 8 * sSz, 6);
 }
+// ======================================== SHERIFF OUTFIT =========================
   if(outFit === 3){
     // ==== BODY ====
     fill(101, 67, 33);
@@ -259,24 +261,21 @@ function mousePressed(){
     level = 1;
     levels();
 }
-if(level === 0 && button.isPressed){
-  level = 90;
-}
+
 }
 
 function draw() {
   background(244, 197, 79);
   if(level === 0){
   startingScreen();
-  drawGui();
+  if(keyIsDown(79)) level = 90
   //--TOOL FOR PLACING PLATFORMS IN THE RIGHT PLACE--
   fill("white");
   textSize(16);
   let roundedX = round(mouseX);
   let roundedY = round(mouseY);
   text("x: " + roundedX + " y: " + roundedY, mouseX + 20, mouseY);
-  //----------------//
-    return;
+  //----------------//  return;
   }
   if(level === 90){
     textSize(16);
@@ -284,12 +283,13 @@ function draw() {
     let roundedY = round(mouseY);
     text("x: " + roundedX + " y: " + roundedY, mouseX + 20, mouseY);
     outFitChanging();
-    return;
   }
-  
-  
+  if(level === 67){
+    bobStanding();
+  }
 
 //player Physics
+if(level > 0 && level < 10){
 player.gravity();
 player.collisions();
 
@@ -322,6 +322,14 @@ if(player.dead !== true){
 }
 
 player.wallCollision();
+}
+
+// draws button
+drawGui();
+if(homeButton.isPressed){
+  level = 0;
+  levels();
+}
 
   //--TOOL FOR PLACING PLATFORMS IN THE RIGHT PLACE--
   fill("white");
@@ -341,6 +349,11 @@ function dieAgain(){
       }
     }
   }
+}
+
+// BOB WATCHING THE SUNSET
+function bobStanding(){
+  background(219, 167, 13);
 }
 
 function levels(){
@@ -582,16 +595,22 @@ class Bob{
   
   body(){
   noStroke();
+  let deathColor;
+  if(outFit === 1) deathColor = color(185, 150, 105) 
+  if(outFit === 2) deathColor = color("black");
+  if(outFit === 3) deathColor = color(101, 67, 33);
 
   if(this.dead){
     // Cracked sand effect when dead
-    fill(185, 150, 105); // sand color
+    fill(deathColor); // sand color
     this.size = 12
     square(this.x, this.y, this.size, 2);
     square(this.x + 14, this.y, this.size, 2);
     square(this.x + 30, this.y, this.size, 2);
   }
   else{
+  // ----------------------------------------------- DESERT WALKER OUTFIT ------------------------------
+  if(outFit === 1){
   // ===== BODY =====
   this.size = 40;
   fill(185, 150, 105); // sand body
@@ -614,6 +633,57 @@ class Bob{
   //right lens
   rect(this.x + 24, this.y + 12, 8, 4, 2);
  }
+ // ----------------------------------- NOIR SPIDERMAN OUTFIT ----------------------------------
+ else if(outFit === 2){
+  this.size = 40;
+  // ===== BODY =====
+  fill("black"); // sand body
+  square(this.x, this.y, this.size, 6);
+  // ===== GOGGLES ====
+  fill(150, 75, 0);
+  // Left frame
+  square(this.x + 8, this.y + 10 , 10, 2);
+  // Right frame
+  square(this.x + 22, this.y + 10, 10, 2);
+  rect(this.x, this.y + 13, this.size, 3);
+   
+  //==== LENS ====
+  fill(100, 180, 200);
+  // Left lens
+  square(this.x + 9, this.y + 11 , 8 , 2);
+  // Right lens
+  square(this.x + 23, this.y + 11, 8, 2);
+ }
+ // ====================================== SHERIFF OUTFIT =====================================
+ if(outFit === 3){
+  this.size = 40;
+  // ==== BODY ====
+  fill(101, 67, 33);
+  square(this.x, this.y, this.size, 6);
+  // ==== SHERIFF HAT ====
+  fill(60, 40, 20);
+  // Brim (Centered on Bob's head)
+  rect(this.x - 4, this.y - 2, this.size + 8, 4, 2);
+  // Top of hat
+  rect(this.x + 6, this.y - 12, 28, 12, 4);
+  // ==== EYES ====
+  fill("white");
+  square(this.x + 8, this.y + 8, 9, 2);
+  square(this.x + 23, this.y + 8, 9, 2);
+  // ==== PUPILS ====
+  fill("black");
+  square(this.x + 10.5, this.y + 10.5, 4, 1);
+  square(this.x + 25.5, this.y + 10.5, 4, 1);
+  // ==== BADGE ====
+  fill(255, 215, 0);
+  push();
+  translate(this.x + (this.size / 2), this.y - 5);
+  rotate(45);
+  rectMode(CENTER);
+  square(0, 0, 6);
+  pop();
+ }
+}
 }
 
 
@@ -644,7 +714,6 @@ handleDeath(){
 // -----------------------------MOVEMENT----------------------------
   
   movement(){
-
     if(this.airTime > 0){ // this is producing the smooth curve when in the air
       this.airTime --;
       this.airTime *= this.decRate; // making Bob slow down while in the air
@@ -696,11 +765,11 @@ handleDeath(){
       // this.wallJumpRemaining = 2;
     }
     }
+    // gives a sliding effect for Bob
     if(abs(this.vx)>0.1) this.vx *= this.decRate;
     else{
       this.vx = 0;
-    } // gives a sliding effect for Bob
-    // this.vx = max(this.vx, 0.01);
+    } 
     this.x += this.vx;
 
 }
@@ -769,7 +838,7 @@ wallCollision(){
       this.x = w.xp - this.size;
       this.vx = 0;
       this.onWall = true;
-      this.wallSide = 2; // left
+      this.wallSide = 2; // left side
     }
     
   }
@@ -841,6 +910,9 @@ levelChanging(){
     this.x = 20;
     this.y = 222;
     this.vy = 0;
+    if(level === 9 && this.x > canvasW){
+      level = 67;
+    }
   }
 }
 }
