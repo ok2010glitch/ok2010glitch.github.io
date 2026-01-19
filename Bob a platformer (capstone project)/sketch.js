@@ -243,7 +243,6 @@ function outFitChanging(){
   }
 }
 
-
 function mousePressed(){
   if(level !== 0) return;
   let bx = canvasW/2;
@@ -285,7 +284,8 @@ function draw() {
     outFitChanging();
   }
   if(level === 67){
-    bobStanding();
+    text("IN PROGRESS", canvasW/2, canvasH/2);
+    return;
   }
 
 //player Physics
@@ -354,6 +354,9 @@ function dieAgain(){
 // BOB WATCHING THE SUNSET
 function bobStanding(){
   background(219, 167, 13);
+  textSize(60);
+  text("IN PROGRESS", canvasW/2, canvasH/2);
+
 }
 
 function levels(){
