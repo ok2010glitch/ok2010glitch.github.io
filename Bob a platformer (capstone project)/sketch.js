@@ -37,7 +37,7 @@ let bgSound;
 // For one time movement one platform
 let movingOne = false;
 
-//Outfits
+//Outfits chaning
 let outFit = 1;
 
 function setup() {
@@ -108,7 +108,7 @@ function startingScreen(){
   fill("black");
   textSize(30)
   text("CHANGE MY OUTFITS", 260, 540);
-  text("BY PRESSING O! ", 255, 600);
+  text("BY PRESSING O!", 255, 600);
   // ===== HEAD SCARF (turban) =====
   fill(180, 140, 90);
   // Main wrap
@@ -146,8 +146,8 @@ function startingScreen(){
 // ================================= OUTFIT CHANGING PAGE ===================================
 
 function outFitChanging(){
-  let sSz = 5; // Scale Factor (10x bigger)
-  let menuSize = 40 * sSz; // Final size: 400px
+  let sSz = 5; // Scale Factor (5x bigger)
+  let menuSize = 40 * sSz;
   let menuX = canvasW/2 - 110; // X position on menu
   let menuY = 280; // Y position on menu
   textAlign(CENTER);
@@ -269,24 +269,23 @@ function draw() {
   startingScreen();
   if(keyIsDown(79)) level = 90
   //--TOOL FOR PLACING PLATFORMS IN THE RIGHT PLACE--
-  fill("white");
-  textSize(16);
-  let roundedX = round(mouseX);
-  let roundedY = round(mouseY);
-  text("x: " + roundedX + " y: " + roundedY, mouseX + 20, mouseY);
+  // fill("white");
+  // textSize(16);
+  // let roundedX = round(mouseX);
+  // let roundedY = round(mouseY);
+  // text("x: " + roundedX + " y: " + roundedY, mouseX + 20, mouseY);
   //----------------//  return;
   }
   if(level === 90){
-    textSize(16);
-    let roundedX = round(mouseX);
-    let roundedY = round(mouseY);
-    text("x: " + roundedX + " y: " + roundedY, mouseX + 20, mouseY);
+    // textSize(16);
+    // let roundedX = round(mouseX);
+    // let roundedY = round(mouseY);
+    // text("x: " + roundedX + " y: " + roundedY, mouseX + 20, mouseY);
     outFitChanging();
-  }
-  if(level === 67){
-    text("IN PROGRESS", canvasW/2, canvasH/2);
-    return;
-  }
+}
+if(level === 10){
+  drawSunset();
+}
 
 //player Physics
 if(level > 0 && level < 10){
@@ -312,7 +311,7 @@ player.handleDeath();
   for(let e of enemy){
     e.display();
     e.move();
-  }
+}
 
 if(player.dead !== true){
  player.movement();
@@ -331,13 +330,13 @@ if(homeButton.isPressed){
   levels();
 }
 
-  //--TOOL FOR PLACING PLATFORMS IN THE RIGHT PLACE--
-  fill("white");
-  textSize(16);
-  let roundedX = round(mouseX);
-  let roundedY = round(mouseY);
-  text("x: " + roundedX + " y: " + roundedY, mouseX + 20, mouseY);
-  //----------------//
+  // //--TOOL FOR PLACING PLATFORMS IN THE RIGHT PLACE--
+  // fill("white");
+  // textSize(16);
+  // let roundedX = round(mouseX);
+  // let roundedY = round(mouseY);
+  // text("x: " + roundedX + " y: " + roundedY, mouseX + 20, mouseY);
+  // //----------------//
 }
 
 // One time moving platform
@@ -349,14 +348,6 @@ function dieAgain(){
       }
     }
   }
-}
-
-// BOB WATCHING THE SUNSET
-function bobStanding(){
-  background(219, 167, 13);
-  textSize(60);
-  text("IN PROGRESS", canvasW/2, canvasH/2);
-
 }
 
 function levels(){
@@ -569,7 +560,46 @@ if(level === 9){
   plat.push(new platform(915,410,120,40,2,1100,0,0));
   //exit platform
   plat.push(new platform(1160,570,160,40,0,0,0,0));
+  return;
 }
+}
+
+
+function drawSunset() {
+  //(SKY GRADIENT done by ai)
+  // --- 1. SKY GRADIENT ---
+  noStroke();
+  for (let i = 0; i <= canvasH; i++) {
+    // Blends from a warm orange to a sandy yellow
+    let inter = map(i, 0, canvasH, 0, 1);
+    let c = lerpColor(color(255, 120, 50), color(244, 197, 79), inter);
+    stroke(c);
+    line(0, i, canvasW, i);
+  }
+  // --- 2. SUN ---
+  fill("white");
+  circle(canvasW/2, canvasH/2, 300);
+  // --- 3. GROUND ----
+  fill(217, 137, 108);
+  rect(0, canvasH/2 + 100, canvasW,300);
+  player.x = canvasW/2 - 20;
+  player.y = canvasH/2 + 62;
+  player.body();
+  // ---- 4. TEXT ----
+  textAlign(CENTER);
+  textFont(textF);
+  fill("white");
+  textSize(50);
+  text("BOB'S JOURNEY HAS ENDED", canvasW/2, canvasH/2 + 200);
+  // ---- 5. Cactus ----
+  let cx = 950;
+  let cy = canvasH/2 + 45; 
+  fill(80, 40, 20); 
+  rect(cx, cy, 15, 60, 8); 
+  rect(cx - 15, cy + 20, 20, 10, 5); 
+  rect(cx - 15, cy + 5, 10, 20, 5); 
+  rect(cx + 10, cy + 30, 20, 10, 5); 
+  rect(cx + 20, cy + 15, 10, 20, 5);
 }
 
 class Bob{
@@ -580,7 +610,7 @@ class Bob{
     this.vy = 0; // velocity y
     this.g = 0.5; // gravity
     this.vx = 0; // velocity x
-    this.speed = 5; //speed for player
+    this.speed = 6; //speed for player
     this.jumpP = -10; // jump power
     this.onGround = false; // checks if Bob is on the ground
     this.onWall = false; // checks if Bob is on wall
@@ -689,6 +719,7 @@ class Bob{
 }
 }
 
+// Handles death timers and count down
 
 handleDeath(){
   if(!this.dead && this.y > canvasH){
@@ -729,8 +760,8 @@ handleDeath(){
       //Left movement
       if(keyIsDown(LEFT_ARROW)){
         this.vx = -this.speed;
-// prevents Bob from leaving the map      
-    if(this.x <= 0){
+      // prevents Bob from leaving the map      
+      if(this.x <= 0){
       this.x = 0;
       this.vx = 0;
     }
@@ -769,7 +800,7 @@ handleDeath(){
     }
     }
     // gives a sliding effect for Bob
-    if(abs(this.vx)>0.1) this.vx *= this.decRate;
+    if(abs(this.vx)>0.1) this.vx *= 0.8;
     else{
       this.vx = 0;
     } 
@@ -887,6 +918,7 @@ spikesCollision(){
   }
 }
 
+// if collided with bots in red colour
 enemyCollision(){
   for(let e of enemy){
     if(
@@ -913,9 +945,6 @@ levelChanging(){
     this.x = 20;
     this.y = 222;
     this.vy = 0;
-    if(level === 9 && this.x > canvasW){
-      level = 67;
-    }
   }
 }
 }
@@ -1035,6 +1064,7 @@ class enemies{
     square(this.xe + 24, this.ye + 9,8,2);
   }
   
+  // to be fair I used the same logic used in the moving platform
   move(){
     this.xe += this.vx;
     // moving left
