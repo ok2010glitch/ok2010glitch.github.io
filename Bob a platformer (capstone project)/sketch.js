@@ -1,12 +1,13 @@
 // Bob a platformer (Capstone Project)
 // Syed Saad Hussain
-// Date
-//
+// 21 January, 2026
+
 // Extra for Experts:
 // - Wall Jumping mechanics
 // - Moving platform that carries the player
 // - Mulitple spike orientations (ground,ceiling,sideways)
 // - Level using system using classes and objects
+// - Level 8 and 9 inspired by the game die again.
 
 // ============================================ GLOBAL VARIABLES ======================================
 
@@ -109,7 +110,7 @@ function startingScreen(){
   textSize(30)
   text("CHANGE MY OUTFITS", 260, 540);
   text("BY PRESSING O!", 255, 600);
-  // ===== HEAD SCARF (turban) =====
+  // ===== HEAD SCARF =====
   fill(180, 140, 90);
   // Main wrap
   rect(menuX, menuY - (6 * sSz), menuSize, 10 * sSz, 6 * sSz);
@@ -584,8 +585,8 @@ function drawSunset() {
   textSize(50);
   text("BOB'S JOURNEY HAS ENDED", canvasW/2, canvasH/2 + 200);
   // ---- 5. Cactus ----
-  let cx = 950;
-  let cy = canvasH/2 + 45; 
+  let cx = 950; // x position
+  let cy = canvasH/2 + 45; // y position
   fill(80, 40, 20); 
   rect(cx, cy, 15, 60, 8); 
   rect(cx - 15, cy + 20, 20, 10, 5); 
@@ -634,7 +635,7 @@ class Bob{
     square(this.x + 30, this.y, this.size, 2);
   }
   else{
-  // ----------------------------------------------- DESERT WALKER OUTFIT ------------------------------
+  // ==================================== DESERT WALKER OUTFIT ============================
   if(outFit === 1){
   // ===== BODY =====
   this.size = 40;
@@ -658,7 +659,7 @@ class Bob{
   //right lens
   rect(this.x + 24, this.y + 12, 8, 4, 2);
  }
- // ----------------------------------- NOIR SPIDERMAN OUTFIT ----------------------------------
+ // ======================================== NOIR SPIDERMAN OUTFIT ===============================
  else if(outFit === 2){
   this.size = 40;
   // ===== BODY =====
@@ -1038,8 +1039,8 @@ class enemies{
     this.xStart = x;
     this.xe = x;
     this.ye = y;
-    this.eSize = 40;
-    this.vx = vx;
+    this.eSize = 40; // size of the enemy
+    this.vx = vx; // velocity x
     this.rg = r; // range in which the enemy/obstacle can travel
   }
   
