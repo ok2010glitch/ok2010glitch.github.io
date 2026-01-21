@@ -260,27 +260,16 @@ function mousePressed(){
     level = 1;
     levels();
 }
-
 }
 
 function draw() {
   background(244, 197, 79);
   if(level === 0){
   startingScreen();
-  if(keyIsDown(79)) level = 90
-  //--TOOL FOR PLACING PLATFORMS IN THE RIGHT PLACE--
-  // fill("white");
-  // textSize(16);
-  // let roundedX = round(mouseX);
-  // let roundedY = round(mouseY);
-  // text("x: " + roundedX + " y: " + roundedY, mouseX + 20, mouseY);
-  //----------------//  return;
+  //changes TO OUTFIT MENU
+  if(keyIsDown(79)) level = 90;
   }
   if(level === 90){
-    // textSize(16);
-    // let roundedX = round(mouseX);
-    // let roundedY = round(mouseY);
-    // text("x: " + roundedX + " y: " + roundedY, mouseX + 20, mouseY);
     outFitChanging();
 }
 if(level === 10){
@@ -289,6 +278,7 @@ if(level === 10){
 
 //player Physics
 if(level > 0 && level < 10){
+
 player.gravity();
 player.collisions();
 
@@ -354,7 +344,7 @@ function levels(){
   plat = [];
   spike = [];
   enemy = [];
-  movingOne = false;
+  movingOne = false; // Will reset every level
 
   if(level === 1){
   plat.push(new platform(0,515,550,canvasH-515,0,0,0));
@@ -582,9 +572,11 @@ function drawSunset() {
   // --- 3. GROUND ----
   fill(217, 137, 108);
   rect(0, canvasH/2 + 100, canvasW,300);
+  if(level === 10){
   player.x = canvasW/2 - 20;
   player.y = canvasH/2 + 62;
   player.body();
+  }else { player.x = 20; player.y = 220}
   // ---- 4. TEXT ----
   textAlign(CENTER);
   textFont(textF);
@@ -629,7 +621,7 @@ class Bob{
   body(){
   noStroke();
   let deathColor;
-  if(outFit === 1) deathColor = color(185, 150, 105) 
+  if(outFit === 1) deathColor = color(185, 150, 105);
   if(outFit === 2) deathColor = color("black");
   if(outFit === 3) deathColor = color(101, 67, 33);
 
@@ -754,11 +746,11 @@ handleDeath(){
     }
     else{
       // Right movement
-      if(keyIsDown(RIGHT_ARROW)){
+      if(keyIsDown(68)){ // d for right
         this.vx = this.speed;
       }
       //Left movement
-      if(keyIsDown(LEFT_ARROW)){
+      if(keyIsDown(65)){ // a for left
         this.vx = -this.speed;
       // prevents Bob from leaving the map      
       if(this.x <= 0){
@@ -839,7 +831,6 @@ handleDeath(){
           print("sliding" + " " + this.x+ " " +  this.vx+ " " +  p.xp+ " " +  p.vx);
         }
         }
-        
         
         //==== HITTING THE CEILING ====
         if(
@@ -978,11 +969,11 @@ class platform{
 
   // moving platform back and forth
   movingPlats(){
-    if(this.vx !== 0){ // if no speed then do nothing
+    if(this.vx !== 0){ 
     this.xp += this.vx;
     // moving left
     if(this.xp + this.w >= this.r){
-      this.xp = this.r - this.w;
+      this.xp = this.r - this.w; // snaps the position when it comes back
       this.vx = -this.vx;
     }
     //moving right
